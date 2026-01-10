@@ -1,0 +1,31 @@
+.card-block {
+    width: 100%;
+
+    grid-area: main;
+
+    margin: auto;
+    padding: var(--space-24);
+
+    border-radius: var(--radius-xs);
+    box-sizing: border-box;
+
+    box-shadow: var(--shadow-e1);
+
+    background: var(--color-surface);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.card__title {
+
+}
+
+.card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+
+    margin-bottom: var(--space-8);
+}

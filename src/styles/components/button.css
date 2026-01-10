@@ -1,0 +1,38 @@
+.btn {
+    border: 1px var(--color-primary) solid;
+    border-radius: var(--radius-xs);
+    background: transparent;
+
+    color: var(--color-primary);
+    text-align: center;
+
+    padding: var(--space-12) var(--space-16);
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition: background var(--animation-normal), opacity var(--animation-normal);
+}
+
+.btn:not(.btn--primary):hover {
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.btn:focus {
+    outline: none;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.btn--primary {
+    color: var(--color-surface);
+    background: var(--color-primary);
+}
+
+.btn--primary:hover {
+    opacity: 85%;
+}
