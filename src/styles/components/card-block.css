@@ -6,7 +6,7 @@
     margin: auto;
     padding: var(--space-24);
 
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-lg);
     box-sizing: border-box;
 
     box-shadow: var(--shadow-e1);

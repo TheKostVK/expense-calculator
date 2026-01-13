@@ -74,6 +74,13 @@ a {
     text-decoration: none;
 }
 
+hr {
+    margin: 0;
+    padding: 0;
+
+    height: 1px;
+}
+
 .caption {
     font-size: var(--font-caption-size);
     line-height: var(--font-caption-line);
