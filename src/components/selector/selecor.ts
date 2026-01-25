@@ -26,6 +26,10 @@ export class Selector implements ISelector {
                 return;
             }
 
+            if (item.dataset.option === 'offOnDropdownClick') {
+                return;
+            }
+
             input.value = item.dataset.value ?? '';
 
             input.classList.add('selected_option');
