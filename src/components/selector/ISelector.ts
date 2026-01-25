@@ -1,8 +1,7 @@
-export interface IGetNodeSelector {
+export interface ISelector {
     name: string;
     title: string;
     placeholder: string;
-    dropdownBody?: HTMLElement;
     options?: {
         value: string;
         label: string;

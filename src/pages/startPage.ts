@@ -1,4 +1,4 @@
-import { getNodeSelector } from '../components/selector/selecor.ts';
+import { Calendar } from '../components/calendar/calendar.ts';
 
 export const startPage = () => {
     const page = document.createElement('div');
@@ -36,23 +36,14 @@ export const startPage = () => {
 
     balanceLabel.append(balanceTitle, balanceInput);
 
-    const selectorLabel = getNodeSelector({
+    const calendarObj = new Calendar({
         name: 'term',
         title: 'На срок',
         placeholder: 'Выбор даты',
-        options: [
-            {
-                value: '1',
-                label: '1 месяц',
-            },
-            {
-                value: '3',
-                label: '3 месяца',
-            },
-        ],
+        showCustomDateSelector: false,
     });
 
-    form.append(balanceLabel, selectorLabel.node);
+    form.append(balanceLabel, calendarObj.getNode().node);
     body.appendChild(form);
 
     const calcButton = document.createElement('button');
