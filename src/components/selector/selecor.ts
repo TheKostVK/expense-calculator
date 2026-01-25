@@ -135,7 +135,7 @@ export class Selector implements ISelector {
      */
     getNode() {
         return {
-            node: this.node,
+            node: this.node || document.createElement('fieldset'),
             destroy: this.destroy,
         };
     }
