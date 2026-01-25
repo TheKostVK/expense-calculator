@@ -1,11 +1,16 @@
-import { getNextDay, getNextMonth, getNextTwoWeek, getNextWeek } from '../../utils/dateUtils.ts';
+import {
+    getLastDayOfCurrentMonth,
+    getNextDay,
+    getNextMonth,
+    getNextTwoWeek,
+    getNextWeek,
+} from '../../utils/dateUtils.ts';
 import { Selector } from '../selector/selecor.ts';
 
 import { ICalendar } from './ICalendar.ts';
 
 export class Calendar extends Selector implements ICalendar {
     showCustomDateSelector = false;
-    currentDate = new Date();
     baseOptions = {
         nextDay: {
             value: getNextDay(),
@@ -22,6 +27,10 @@ export class Calendar extends Selector implements ICalendar {
         nextMonth: {
             value: getNextMonth(),
             label: 'Месяц',
+        },
+        lastDayOfMonth: {
+            value: getLastDayOfCurrentMonth(),
+            label: 'До конца месяца',
         },
     };
 

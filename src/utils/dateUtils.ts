@@ -20,3 +20,7 @@ export function getNextTwoWeek() {
 export function getNextMonth() {
     return new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
 }
+
+export function getLastDayOfCurrentMonth(): Date {
+    return new Date(today.getFullYear(), today.getMonth() + 1, 0);
+}
