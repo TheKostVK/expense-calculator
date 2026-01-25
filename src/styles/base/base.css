@@ -81,6 +81,12 @@ hr {
     height: 1px;
 }
 
+fieldset {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
 .caption {
     font-size: var(--font-caption-size);
     line-height: var(--font-caption-line);
