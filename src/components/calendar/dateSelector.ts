@@ -1,4 +1,5 @@
 import nextSvg from '../../assets/next.svg';
+import prevDisabledSvg from '../../assets/prev-disabled.svg';
 import prevSvg from '../../assets/prev.svg';
 import { getCurrentDate } from '../../utils/dateUtils.ts';
 
@@ -50,7 +51,21 @@ export class DateSelector {
         const prevMonthStart = this.getMonthStart(this.selectedDate);
         prevMonthStart.setMonth(prevMonthStart.getMonth() - 1);
 
-        this.prevButtonNode.disabled = prevMonthStart < currentMonthStart;
+        const disabled = prevMonthStart < currentMonthStart;
+
+        this.prevButtonNode.disabled = disabled;
+
+        const prevImg = document.createElement('img');
+
+        if (disabled) {
+            prevImg.src = prevDisabledSvg;
+
+            this.prevButtonNode.replaceChildren(prevImg);
+        } else {
+            prevImg.src = prevSvg;
+
+            this.prevButtonNode.replaceChildren(prevImg);
+        }
     }
 
     /**
