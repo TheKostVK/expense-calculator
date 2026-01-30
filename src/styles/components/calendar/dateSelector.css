@@ -32,6 +32,8 @@
 .calendar__body {
     grid-area: body;
 
+    margin: auto;
+
     display: flex;
     flex-direction: column;
     justify-content: center;

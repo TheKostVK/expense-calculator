@@ -277,7 +277,22 @@ export class DateSelector {
         next.addEventListener('click', this.handleNextMount.bind(this));
     }
 
+    public destroy() {
+        this.prevButtonNode?.removeEventListener('click', this.handlePrevMount.bind(this));
+        this.nextButtonNode?.removeEventListener('click', this.handleNextMount.bind(this));
+
+        this.calendarNode?.remove();
+
+        this.calendarNode = undefined;
+        this.prevButtonNode = undefined;
+        this.nextButtonNode = undefined;
+    }
+
     public getNode() {
+        if (!this.calendarNode) {
+            return document.createElement('div');
+        }
+
         return this.calendarNode;
     }
 }

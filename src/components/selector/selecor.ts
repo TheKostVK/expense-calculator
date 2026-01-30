@@ -1,9 +1,10 @@
 import { ISelector } from './ISelector.ts';
 
 export class Selector implements ISelector {
-    node: HTMLFieldSetElement | null = null;
-    dropdown: HTMLDivElement | null = null;
-    destroy: () => void = () => {};
+    selector: HTMLFieldSetElement | undefined = undefined;
+    dropdown: HTMLDivElement | undefined = undefined;
+    input: HTMLInputElement | undefined = undefined;
+    button: HTMLButtonElement | undefined = undefined;
     name: string = '';
     title: string = '';
     placeholder: string = '';
@@ -14,62 +15,6 @@ export class Selector implements ISelector {
         this.title = data.title;
         this.placeholder = data.placeholder;
         this.options = data.options ?? [];
-
-        /**
-         * Обработка клика по пункту выпадающего меню
-         */
-        const onDropdownItemClick = (evt: MouseEvent) => {
-            evt.stopPropagation();
-
-            const target = evt.target as HTMLElement;
-            const el = target.closest<HTMLElement>('[data-value]');
-
-            if (!el) {
-                return;
-            }
-
-            input.value = el.dataset.value ?? '';
-
-            // Специальный пункт (например, "Своя дата")
-            if (el.dataset.option === 'offOnDropdownClick') {
-                return;
-            }
-
-            dropdown.classList.remove('dropdown_menu-visible');
-        };
-
-        /**
-         * Открытие / закрытие выпадающего меню
-         */
-        const onButtonClick = (evt: Event) => {
-            evt.stopPropagation();
-
-            const target = evt.target as HTMLElement;
-
-            // Игнорируем клики внутри dropdown
-            if (dropdown.contains(target)) {
-                return;
-            }
-
-            if (target === input || button.contains(target)) {
-                if (!dropdown.classList.contains('dropdown_menu-visible')) {
-                    this.openDropdown();
-                } else {
-                    this.closeDropdown();
-                }
-            }
-        };
-
-        /**
-         * Закрытие меню по клику вне компонента
-         */
-        const onDocumentClick = (evt: MouseEvent) => {
-            const target = evt.target as HTMLElement;
-
-            if (!selector.contains(target)) {
-                dropdown.classList.remove('dropdown_menu-visible');
-            }
-        };
 
         /**
          * Корневой контейнер селектора
@@ -94,6 +39,8 @@ export class Selector implements ISelector {
         input.placeholder = this.placeholder;
         input.readOnly = true;
 
+        this.input = input;
+
         /**
          * Кнопка открытия меню
          */
@@ -108,6 +55,8 @@ export class Selector implements ISelector {
 
         button.appendChild(img);
 
+        this.button = button;
+
         /**
          * Выпадающее меню
          */
@@ -116,34 +65,87 @@ export class Selector implements ISelector {
 
         selector.append(legend, input, button, dropdown);
 
-        selector.addEventListener('click', onButtonClick);
-        dropdown.addEventListener('click', onDropdownItemClick);
-        document.addEventListener('click', onDocumentClick);
-
-        this.node = selector;
+        this.selector = selector;
         this.dropdown = dropdown;
 
-        this.destroy = () => {
-            selector.removeEventListener('click', onButtonClick);
-            dropdown.removeEventListener('click', onDropdownItemClick);
-            document.removeEventListener('click', onDocumentClick);
-        };
+        this.selector.addEventListener('click', this.onButtonClick.bind(this));
+        this.dropdown.addEventListener('click', this.onDropdownItemClick.bind(this));
+        document.addEventListener('click', this.onDocumentClick.bind(this));
+    }
+
+    public destroy() {
+        this.selector?.removeEventListener('click', this.onButtonClick);
+        this.dropdown?.removeEventListener('click', this.onDropdownItemClick);
+        document.removeEventListener('click', this.onDocumentClick);
     }
 
     /**
      * Получить DOM-узел селектора
      */
-    getNode() {
-        return {
-            node: this.node || document.createElement('fieldset'),
-            destroy: this.destroy,
-        };
+    public getNode() {
+        return this.selector || document.createElement('fieldset');
+    }
+
+    /**
+     * Обработка клика по пункту выпадающего меню
+     */
+    private onDropdownItemClick = (evt: MouseEvent) => {
+        evt.stopPropagation();
+
+        const target = evt.target as HTMLElement;
+        const el = target.closest<HTMLElement>('[data-value]');
+
+        if (!el || !this.input || !this.dropdown) {
+            return;
+        }
+
+        this.input.value = el.dataset.value ?? '';
+
+        // Специальный пункт (например, "Своя дата")
+        if (el.dataset.option === 'offOnDropdownClick') {
+            return;
+        }
+
+        this.dropdown.classList.remove('dropdown_menu-visible');
+    };
+
+    /**
+     * Открытие / закрытие выпадающего меню
+     */
+    private onButtonClick(evt: Event) {
+        evt.stopPropagation();
+
+        const target = evt.target as HTMLElement;
+
+        // Игнорируем клики внутри dropdown
+        if (!this.dropdown || !this.button || !this.input || this.dropdown.contains(target)) {
+            return;
+        }
+
+        if (target === this.input || this.button.contains(target)) {
+            if (!this.dropdown.classList.contains('dropdown_menu-visible')) {
+                this.openDropdown();
+            } else {
+                this.closeDropdown();
+            }
+        }
+    }
+
+    /**
+     * Закрытие меню по клику вне компонента
+     */
+    private onDocumentClick(evt: MouseEvent) {
+        const target = evt.target as HTMLElement;
+
+        if (!this.selector || !this.selector.contains(target)) {
+            this.dropdown?.classList.remove('dropdown_menu-visible');
+        }
     }
 
     /**
      * Открыть выпадающее меню
      */
-    openDropdown() {
+    private openDropdown() {
         if (!this.dropdown) {
             return;
         }
@@ -156,7 +158,7 @@ export class Selector implements ISelector {
     /**
      * Закрыть выпадающее меню
      */
-    closeDropdown() {
+    private closeDropdown() {
         if (!this.dropdown) {
             return;
         }

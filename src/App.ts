@@ -9,7 +9,7 @@ export function initApp(): void {
 
     const page = startPage();
 
-    app.appendChild(page);
+    app.appendChild(page.node);
 
     return;
 }

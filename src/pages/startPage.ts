@@ -1,5 +1,6 @@
 import { Calendar } from '../components/calendar/calendar.ts';
 import { DateSelector } from '../components/calendar/dateSelector.ts';
+import { currencyFormatter, onlyNumbersFormatter } from '../utils/inputFormatter.ts';
 
 export const startPage = () => {
     const page = document.createElement('div');
@@ -32,8 +33,12 @@ export const startPage = () => {
 
     const balanceInput = document.createElement('input');
     balanceInput.name = 'start-balance';
+    balanceInput.pattern = '^[0-9]*$';
     balanceInput.classList.add('input__input');
     balanceInput.placeholder = 'Стартовый баланс';
+
+    balanceInput.addEventListener('input', onlyNumbersFormatter);
+    balanceInput.addEventListener('change', currencyFormatter);
 
     balanceLabel.append(balanceTitle, balanceInput);
 
@@ -48,7 +53,7 @@ export const startPage = () => {
         dateSelector
     );
 
-    form.append(balanceLabel, calendarObj.getNode().node);
+    form.append(balanceLabel, calendarObj.getNode());
     body.appendChild(form);
 
     const calcButton = document.createElement('button');
@@ -59,5 +64,14 @@ export const startPage = () => {
     main.appendChild(cardBlock);
     page.appendChild(main);
 
-    return page;
+    return {
+        node: page,
+        destroy: () => {
+            balanceInput.removeEventListener('input', onlyNumbersFormatter);
+            balanceInput.removeEventListener('change', currencyFormatter);
+
+            dateSelector.destroy();
+            calendarObj.destroy();
+        },
+    };
 };
