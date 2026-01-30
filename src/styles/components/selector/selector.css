@@ -24,6 +24,12 @@
     box-sizing: border-box;
 
     transition: border-color ease-in-out var(--animation-normal), box-shadow ease-in-out var(--animation-fast);
+
+    cursor: default;
+}
+
+.selector__input:focus-visible::selection {
+    background-color: transparent;
 }
 
 .selector__drop_button {

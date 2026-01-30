@@ -8,9 +8,11 @@ import {
 import { Selector } from '../selector/selecor.ts';
 
 import { ICalendar } from './ICalendar.ts';
+import { IDateSelector } from './IDateSelector.ts';
 
 export class Calendar extends Selector implements ICalendar {
     showCustomDateSelector = false;
+    dateSelector: IDateSelector | null = null;
 
     baseOptions = {
         nextDay: { value: getNextDay(), label: 'День' },
@@ -20,9 +22,10 @@ export class Calendar extends Selector implements ICalendar {
         lastDayOfMonth: { value: getLastDayOfCurrentMonth(), label: 'До конца месяца' },
     };
 
-    constructor(data: ICalendar) {
+    constructor(data: ICalendar, dateSelector: IDateSelector) {
         super(data);
         this.showCustomDateSelector = data.showCustomDateSelector;
+        this.dateSelector = dateSelector;
     }
 
     /**
@@ -56,10 +59,13 @@ export class Calendar extends Selector implements ICalendar {
     };
 
     protected renderCalendar(dropdown: HTMLDivElement) {
+        if (!this.dateSelector) {
+            return;
+        }
+
         dropdown.replaceChildren();
 
-        const calendar = document.createElement('div');
-        calendar.classList.add('calendar');
+        const calendar = this.dateSelector.getNode();
 
         dropdown.appendChild(calendar);
     }
@@ -71,8 +77,10 @@ export class Calendar extends Selector implements ICalendar {
             const item = document.createElement('button');
             const span1 = document.createElement('span');
             const span2 = document.createElement('span');
+
             item.type = 'button';
             item.classList.add('dropdown_menu--item');
+
             return { item, span1, span2 };
         };
 

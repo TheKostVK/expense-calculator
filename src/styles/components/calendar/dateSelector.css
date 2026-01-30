@@ -1,0 +1,113 @@
+.calendar {
+    max-width: 300px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: 1fr 10fr 1fr;
+    grid-template-rows: 1fr;
+
+    grid-template-areas:"prev body next";
+}
+
+.calendar__btn {
+    border: none;
+    border-radius: var(--radius-xs);
+    background-color: transparent;
+
+    cursor: pointer;
+
+    transition: background-color var(--animation-normal);
+}
+
+.calendar__btn:hover {
+    color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+}
+
+.calendar__body {
+    grid-area: body;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar__prev {
+    grid-area: prev;
+}
+
+.calendar__next {
+    grid-area: next;
+}
+
+.calendar__title {
+    padding: 0 var(--space-8);
+
+    text-transform: capitalize;
+
+    align-self: stretch;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.date-picker {
+    display: flex;
+    flex-direction: column;
+
+    padding: var(--space-8);
+
+    gap: 2px;
+}
+
+.date-picker__day-name {
+    width: 30px;
+    height: 17px;
+
+    text-align: center;
+    line-height: 17px;
+
+    color: var(--color-text-secondary);
+}
+
+.date-picker__day-name span {
+    display: inline-block;
+}
+
+.date-picker__week {
+    display: flex;
+    gap: 2px;
+}
+
+.date-picker__day {
+    width: 30px;
+    height: 32px;
+
+    padding: 0;
+
+    text-align: center;
+
+    border: none;
+    border-radius: var(--radius-xs);
+    background-color: var(--color-bg);
+
+    cursor: pointer;
+
+    transition: background-color var(--animation-normal);
+}
+
+.date-picker__day:not(.date-picker__day--no-active):hover {
+    color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+}
+
+.date-picker__day--no-active {
+    color: var(--color-bg);
+
+    background-color: color-mix(in srgb, var(--color-bg) 30%, var(--color-surface));
+
+    cursor: default;
+}

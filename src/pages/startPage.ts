@@ -1,4 +1,5 @@
 import { Calendar } from '../components/calendar/calendar.ts';
+import { DateSelector } from '../components/calendar/dateSelector.ts';
 
 export const startPage = () => {
     const page = document.createElement('div');
@@ -36,12 +37,16 @@ export const startPage = () => {
 
     balanceLabel.append(balanceTitle, balanceInput);
 
-    const calendarObj = new Calendar({
-        name: 'term',
-        title: 'На срок',
-        placeholder: 'Выбор даты',
-        showCustomDateSelector: false,
-    });
+    const dateSelector = new DateSelector();
+    const calendarObj = new Calendar(
+        {
+            name: 'term',
+            title: 'На срок',
+            placeholder: 'Выбор даты',
+            showCustomDateSelector: false,
+        },
+        dateSelector
+    );
 
     form.append(balanceLabel, calendarObj.getNode().node);
     body.appendChild(form);
