@@ -74,9 +74,9 @@ export class Selector implements ISelector {
     }
 
     public destroy() {
-        this.selector?.removeEventListener('click', this.onButtonClick);
-        this.dropdown?.removeEventListener('click', this.onDropdownItemClick);
-        document.removeEventListener('click', this.onDocumentClick);
+        this.selector?.removeEventListener('click', this.onButtonClick.bind(this));
+        this.dropdown?.removeEventListener('click', this.onDropdownItemClick.bind(this));
+        document.removeEventListener('click', this.onDocumentClick.bind(this));
     }
 
     /**
@@ -145,7 +145,7 @@ export class Selector implements ISelector {
     /**
      * Открыть выпадающее меню
      */
-    private openDropdown() {
+    protected openDropdown() {
         if (!this.dropdown) {
             return;
         }
@@ -158,7 +158,7 @@ export class Selector implements ISelector {
     /**
      * Закрыть выпадающее меню
      */
-    private closeDropdown() {
+    protected closeDropdown() {
         if (!this.dropdown) {
             return;
         }

@@ -13,6 +13,14 @@ export class DateSelector {
 
     constructor() {
         this.currentDate.setHours(23, 59, 59, 999);
+
+        const last_day = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0, 23, 59, 59);
+
+        if (last_day.getDate() === this.currentDate.getDate()) {
+            this.selectedDate.setMonth(this.selectedDate.getMonth() + 1);
+            this.selectedDate.setDate(0);
+        }
+
         this.createCalendarNode();
     }
 

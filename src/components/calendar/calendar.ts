@@ -116,7 +116,7 @@ export class Calendar extends Selector implements ICalendar {
             return;
         }
 
-        this.dropdown.addEventListener('click', this.onDropdownCalendarClick);
+        this.dropdown.addEventListener('click', this.onDropdownCalendarClick.bind(this));
     }
 
     override closeDropdown() {
@@ -126,6 +126,6 @@ export class Calendar extends Selector implements ICalendar {
             return;
         }
 
-        this.dropdown.removeEventListener('click', this.onDropdownCalendarClick);
+        this.dropdown.removeEventListener('click', this.onDropdownCalendarClick.bind(this));
     }
 }
