@@ -33,7 +33,6 @@ export const startPage = () => {
 
     const balanceInput = document.createElement('input');
     balanceInput.name = 'start-balance';
-    balanceInput.pattern = '^[0-9]*$';
     balanceInput.classList.add('input__input');
     balanceInput.placeholder = 'Стартовый баланс';
 
@@ -53,16 +52,32 @@ export const startPage = () => {
         dateSelector
     );
 
-    form.append(balanceLabel, calendarObj.getNode());
-    body.appendChild(form);
-
     const calcButton = document.createElement('button');
     calcButton.classList.add('btn', 'btn--primary');
     calcButton.textContent = 'Рассчитать';
+    calcButton.type = 'submit';
 
-    cardBlock.append(title, body, calcButton);
+    form.append(balanceLabel, calendarObj.getNode(), calcButton);
+    body.appendChild(form);
+
+    cardBlock.append(title, body);
     main.appendChild(cardBlock);
     page.appendChild(main);
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const startBalance: Element | RadioNodeList | null = form.elements.namedItem('start-balance');
+        const term: Element | RadioNodeList | null = form.elements.namedItem('term');
+
+        if (!startBalance || !term) {
+            return;
+        }
+
+        if ('value' in startBalance && 'value' in term) {
+            console.log(startBalance.value, term.value);
+        }
+    });
 
     return {
         node: page,
