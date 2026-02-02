@@ -89,6 +89,9 @@ export class DateSelector {
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
 
+        firstDay.setHours(0, 0, 0, 0);
+        lastDay.setHours(23, 59, 59, 999);
+
         // День недели первого дня (0 = понедельник)
         const startDay = (firstDay.getDay() + 6) % 7;
 
@@ -99,6 +102,7 @@ export class DateSelector {
 
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const date = new Date(year, month, day);
+            date.setHours(0, 0, 0, 0);
 
             week.push(date);
 
@@ -202,8 +206,8 @@ export class DateSelector {
                 dayNode.type = 'button';
 
                 if (day) {
+                    dayNode.value = day.toISOString().toString();
                     dayNode.textContent = this.formatterDay.format(day);
-
                     dayNode.dataset.value = `до ${this.formatterMount.format(day)}`;
 
                     if (day < this.currentDate) {

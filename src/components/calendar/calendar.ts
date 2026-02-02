@@ -90,6 +90,7 @@ export class Calendar extends Selector implements ICalendar {
             span1.textContent = option.label;
             span2.textContent = `до ${this.formatter.format(option.value)}`;
 
+            item.value = option.value.toISOString().toString();
             item.dataset.key = key;
             item.dataset.value = `${option.label} (до ${this.formatter.format(option.value)})`;
 
@@ -101,6 +102,7 @@ export class Calendar extends Selector implements ICalendar {
         const { item, span1, span2 } = getMenuItem();
         span1.textContent = 'Своя дата';
 
+        item.value = 'customDate';
         item.dataset.key = 'customDate';
         item.dataset.value = 'Своя дата';
         item.dataset.option = 'offOnDropdownClick';

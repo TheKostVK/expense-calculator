@@ -99,6 +99,8 @@ export class Selector implements ISelector {
             return;
         }
 
+        console.log(el);
+
         this.input.value = el.dataset.value ?? '';
 
         // Специальный пункт (например, "Своя дата")
