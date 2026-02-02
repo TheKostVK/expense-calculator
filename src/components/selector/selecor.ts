@@ -1,6 +1,7 @@
 import { ISelector } from './ISelector.ts';
 
 export class Selector implements ISelector {
+    hiddenInput: HTMLInputElement | undefined = undefined;
     selector: HTMLFieldSetElement | undefined = undefined;
     dropdown: HTMLDivElement | undefined = undefined;
     input: HTMLInputElement | undefined = undefined;
@@ -35,11 +36,17 @@ export class Selector implements ISelector {
          */
         const input = document.createElement('input');
         input.classList.add('selector__input');
-        input.name = this.name;
         input.placeholder = this.placeholder;
+        input.name = 'input';
         input.readOnly = true;
 
         this.input = input;
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = this.name;
+
+        this.hiddenInput = hiddenInput;
 
         /**
          * Кнопка открытия меню
@@ -63,7 +70,7 @@ export class Selector implements ISelector {
         const dropdown = document.createElement('div');
         dropdown.classList.add('dropdown_menu');
 
-        selector.append(legend, input, button, dropdown);
+        selector.append(legend, input, hiddenInput, button, dropdown);
 
         this.selector = selector;
         this.dropdown = dropdown;
@@ -93,15 +100,15 @@ export class Selector implements ISelector {
         evt.stopPropagation();
 
         const target = evt.target as HTMLElement;
-        const el = target.closest<HTMLElement>('[data-value]');
+        const el: HTMLButtonElement | null = target.closest<HTMLButtonElement>('[data-value]');
 
-        if (!el || !this.input || !this.dropdown) {
+        if (!el || !this.input || !this.hiddenInput || !this.dropdown) {
             return;
         }
 
-        console.log(el);
-
         this.input.value = el.dataset.value ?? '';
+
+        this.hiddenInput.value = el.value ?? '';
 
         // Специальный пункт (например, "Своя дата")
         if (el.dataset.option === 'offOnDropdownClick') {
