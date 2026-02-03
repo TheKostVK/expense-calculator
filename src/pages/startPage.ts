@@ -1,6 +1,6 @@
 import { Calendar } from '../components/calendar/calendar.ts';
 import { DateSelector } from '../components/calendar/dateSelector.ts';
-import { currencyFormatter, onlyNumbersFormatter } from '../utils/inputFormatter.ts';
+import { currencyFormatterEvent, numberFormatter, onlyNumbersFormatter } from '../utils/inputFormatter.ts';
 
 export const startPage = () => {
     const page = document.createElement('div');
@@ -37,7 +37,7 @@ export const startPage = () => {
     balanceInput.placeholder = 'Стартовый баланс';
 
     balanceInput.addEventListener('input', onlyNumbersFormatter);
-    balanceInput.addEventListener('change', currencyFormatter);
+    balanceInput.addEventListener('change', currencyFormatterEvent);
 
     balanceLabel.append(balanceTitle, balanceInput);
 
@@ -75,7 +75,7 @@ export const startPage = () => {
         }
 
         if ('value' in startBalance && 'value' in term) {
-            console.log(startBalance.value, term.value);
+            console.log(numberFormatter(startBalance.value), term.value);
         }
     });
 
@@ -83,7 +83,7 @@ export const startPage = () => {
         node: page,
         destroy: () => {
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
-            balanceInput.removeEventListener('change', currencyFormatter);
+            balanceInput.removeEventListener('change', currencyFormatterEvent);
 
             dateSelector.destroy();
             calendarObj.destroy();

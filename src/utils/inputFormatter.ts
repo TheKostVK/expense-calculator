@@ -4,7 +4,7 @@ export function onlyNumbersFormatter(evt: Event) {
     target.value = target.value.replace(/[^0-9]/g, '');
 }
 
-export function currencyFormatter(evt: Event) {
+export function currencyFormatterEvent(evt: Event) {
     const target = evt.target as HTMLInputElement;
 
     target.value = new Intl.NumberFormat('ru-RU', {
@@ -12,4 +12,19 @@ export function currencyFormatter(evt: Event) {
         currency: 'RUB',
         maximumFractionDigits: 0,
     }).format(Number(target.value));
+}
+
+export function numberFormatterEvent(evt: Event) {
+    const target = evt.target as HTMLInputElement;
+
+    target.value = new Intl.NumberFormat('ru-RU', {
+        style: 'decimal',
+        maximumFractionDigits: 0,
+    }).format(Number(target.value));
+}
+
+export function numberFormatter(value: string) {
+    const reg = /\D/gi;
+
+    return value.replace(reg, '');
 }
