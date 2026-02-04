@@ -75,7 +75,7 @@ export class DayLimitPresenter implements IDayLimitPresenter {
 
         const balanceTitle = document.createElement('span');
         balanceTitle.classList.add('input__title', 'caption');
-        balanceTitle.textContent = 'Укажите баланс';
+        balanceTitle.textContent = 'Введите трату';
 
         const balanceInput = document.createElement('input');
         balanceInput.name = 'start-balance';

@@ -32,7 +32,7 @@ export class BalancePresenter implements IBalancePresenter {
 
         const cardDescSpan2 = document.createElement('span');
         cardDescSpan2.classList.add('card__title-right');
-        cardDescSpan2.textContent = `${balanceModel.dayLimit} ₽ в день`;
+        cardDescSpan2.textContent = `${currencyFormatter(balanceModel.dayLimit)} в день`;
 
         cardDescription.appendChild(cardDescSpan1);
         cardDescription.appendChild(cardDescSpan2);
