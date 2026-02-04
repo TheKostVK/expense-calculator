@@ -50,3 +50,12 @@ export function getLastDayOfCurrentMonth(): Date {
     const today = getCurrentDate();
     return new Date(today.getFullYear(), today.getMonth() + 1, 0);
 }
+
+/**
+ * Возвращает количество дней между двумя датами.
+ * @param date1 - дата 1 начало
+ * @param date2 - дата 2 конец
+ */
+export function differentDateInDay(date1: Date, date2: Date): number {
+    return Math.floor((date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24)) * -1;
+}

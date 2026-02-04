@@ -1,0 +1,45 @@
+.balance-block {
+    display: flex;
+    justify-content: start;
+    align-items: baseline;
+
+    gap: var(--space-8);
+}
+
+.balance-block__balance {
+
+}
+
+.balance-block__balance--remained {
+    color: var(--color-success);
+}
+
+.balance-block__balance--available {
+    position: relative;
+
+    margin-left: var(--space-16);
+
+    color: var(--color-text-secondary);
+}
+
+.balance-block__balance--available::before {
+    content: '/';
+
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%) translateX(-170%);
+
+    margin: 0 var(--space-4);
+}
+
+.balance-block__day {
+    color: var(--color-text-secondary);
+}
+
+.balance-block__change-button {
+
+}
+
+.balance-block__wasted-comment {
+    color: var(--color-text-secondary);
+}

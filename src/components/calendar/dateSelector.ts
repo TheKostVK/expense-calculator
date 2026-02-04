@@ -1,7 +1,7 @@
 import nextSvg from '../../assets/next.svg';
 import prevDisabledSvg from '../../assets/prev-disabled.svg';
 import prevSvg from '../../assets/prev.svg';
-import { getCurrentDate } from '../../utils/dateUtils.ts';
+import { getCurrentDate } from '../../utils/date/dateUtils.ts';
 
 export class DateSelector {
     calendarNode: HTMLElement | undefined;
@@ -10,6 +10,19 @@ export class DateSelector {
     nextButtonNode: HTMLButtonElement | undefined;
     currentDate: Date = getCurrentDate();
     selectedDate: Date = getCurrentDate();
+    /**
+     * Стабильный formatter
+     */
+    private formatterDay = new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+    });
+    /**
+     * Стабильный formatter
+     */
+    private formatterMount = new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+    });
 
     constructor() {
         this.currentDate.setHours(23, 59, 59, 999);
@@ -24,20 +37,24 @@ export class DateSelector {
         this.createCalendarNode();
     }
 
-    /**
-     * Стабильный formatter
-     */
-    private formatterDay = new Intl.DateTimeFormat('ru-RU', {
-        day: 'numeric',
-    });
+    public destroy() {
+        this.prevButtonNode?.removeEventListener('click', this.handlePrevMount.bind(this));
+        this.nextButtonNode?.removeEventListener('click', this.handleNextMount.bind(this));
 
-    /**
-     * Стабильный formatter
-     */
-    private formatterMount = new Intl.DateTimeFormat('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-    });
+        this.calendarNode?.remove();
+
+        this.calendarNode = undefined;
+        this.prevButtonNode = undefined;
+        this.nextButtonNode = undefined;
+    }
+
+    public getNode() {
+        if (!this.calendarNode) {
+            return document.createElement('div');
+        }
+
+        return this.calendarNode;
+    }
 
     /**
      * Нормализует дату к первому дню месяца (00:00:00.000)
@@ -102,7 +119,7 @@ export class DateSelector {
 
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const date = new Date(year, month, day);
-            date.setHours(0, 0, 0, 0);
+            date.setHours(23, 59, 59, 999);
 
             week.push(date);
 
@@ -287,24 +304,5 @@ export class DateSelector {
 
         prev.addEventListener('click', this.handlePrevMount.bind(this));
         next.addEventListener('click', this.handleNextMount.bind(this));
-    }
-
-    public destroy() {
-        this.prevButtonNode?.removeEventListener('click', this.handlePrevMount.bind(this));
-        this.nextButtonNode?.removeEventListener('click', this.handleNextMount.bind(this));
-
-        this.calendarNode?.remove();
-
-        this.calendarNode = undefined;
-        this.prevButtonNode = undefined;
-        this.nextButtonNode = undefined;
-    }
-
-    public getNode() {
-        if (!this.calendarNode) {
-            return document.createElement('div');
-        }
-
-        return this.calendarNode;
     }
 }

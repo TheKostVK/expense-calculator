@@ -4,7 +4,7 @@ import {
     getNextMonth,
     getNextTwoWeek,
     getNextWeek,
-} from '../../utils/dateUtils.ts';
+} from '../../utils/date/dateUtils.ts';
 import { Selector } from '../selector/selecor.ts';
 
 import { ICalendar } from './ICalendar.ts';
@@ -21,13 +21,6 @@ export class Calendar extends Selector implements ICalendar {
         nextMonth: { value: getNextMonth(), label: 'Месяц' },
         lastDayOfMonth: { value: getLastDayOfCurrentMonth(), label: 'До конца месяца' },
     };
-
-    constructor(data: ICalendar, dateSelector: IDateSelector) {
-        super(data);
-        this.showCustomDateSelector = data.showCustomDateSelector;
-        this.dateSelector = dateSelector;
-    }
-
     /**
      * Стабильный formatter
      */
@@ -36,27 +29,31 @@ export class Calendar extends Selector implements ICalendar {
         month: 'long',
     });
 
-    /**
-     * Стабильный listener
-     */
-    private onDropdownCalendarClick = (evt: MouseEvent) => {
-        evt.stopPropagation();
+    constructor(data: ICalendar, dateSelector: IDateSelector) {
+        super(data);
+        this.showCustomDateSelector = data.showCustomDateSelector;
+        this.dateSelector = dateSelector;
+    }
+
+    override openDropdown() {
+        super.openDropdown();
 
         if (!this.dropdown) {
             return;
         }
 
-        const target = evt.target as HTMLElement;
-        const item = target.closest<HTMLButtonElement>('.dropdown_menu--item');
+        this.dropdown.addEventListener('click', this.onDropdownCalendarClick.bind(this));
+    }
 
-        if (!item) {
+    override closeDropdown() {
+        super.closeDropdown();
+
+        if (!this.dropdown) {
             return;
         }
 
-        if (item.dataset.key === 'customDate') {
-            this.renderCalendar(this.dropdown);
-        }
-    };
+        this.dropdown.removeEventListener('click', this.onDropdownCalendarClick.bind(this));
+    }
 
     protected renderCalendar(dropdown: HTMLDivElement) {
         if (!this.dateSelector) {
@@ -90,6 +87,8 @@ export class Calendar extends Selector implements ICalendar {
             span1.textContent = option.label;
             span2.textContent = `до ${this.formatter.format(option.value)}`;
 
+            option.value.setHours(23, 59, 59, 999);
+
             item.value = option.value.toISOString().toString();
             item.dataset.key = key;
             item.dataset.value = `${option.label} (до ${this.formatter.format(option.value)})`;
@@ -111,23 +110,25 @@ export class Calendar extends Selector implements ICalendar {
         dropdown.appendChild(item);
     }
 
-    override openDropdown() {
-        super.openDropdown();
+    /**
+     * Стабильный listener
+     */
+    private onDropdownCalendarClick = (evt: MouseEvent) => {
+        evt.stopPropagation();
 
         if (!this.dropdown) {
             return;
         }
 
-        this.dropdown.addEventListener('click', this.onDropdownCalendarClick.bind(this));
-    }
+        const target = evt.target as HTMLElement;
+        const item = target.closest<HTMLButtonElement>('.dropdown_menu--item');
 
-    override closeDropdown() {
-        super.closeDropdown();
-
-        if (!this.dropdown) {
+        if (!item) {
             return;
         }
 
-        this.dropdown.removeEventListener('click', this.onDropdownCalendarClick.bind(this));
-    }
+        if (item.dataset.key === 'customDate') {
+            this.renderCalendar(this.dropdown);
+        }
+    };
 }

@@ -109,12 +109,7 @@ fieldset {
     max-width: 1140px;
     margin: auto;
 
-    display: grid;
-    grid-template-rows: 1fr;
-}
-
-.main {
-    padding: var(--grid-margin) 0;
+    padding: var(--space-64) 0;
 
     display: grid;
     grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
@@ -123,6 +118,17 @@ fieldset {
     grid-template-areas: ". . . main main main main main main . . .";
 
     box-sizing: border-box;
+}
+
+.main {
+    grid-area: main;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+
+    gap: var(--space-8);
 }
 
 @media (max-width: 1200px) {
@@ -138,12 +144,17 @@ fieldset {
 
     .page {
         max-width: 704px;
-    }
 
-    .main {
         grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
         grid-template-areas: ". main main main main main main .";
         gap: var(--grid-gutter);
+    }
+
+    .main {
+        justify-content: center;
+        align-items: center;
+
+        gap: var(--space-8);
     }
 }
 
@@ -168,11 +179,13 @@ fieldset {
 
     .page {
         max-width: 328px;
-    }
 
-    .main {
         grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
         grid-template-areas: "main main main main";
         gap: var(--grid-gutter);
+    }
+
+    .main {
+
     }
 }

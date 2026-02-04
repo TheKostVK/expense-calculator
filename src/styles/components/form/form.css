@@ -1,7 +1,14 @@
-
 .form {
     display: flex;
     flex-direction: column;
-    
+
     gap: var(--space-16);
+}
+
+.form--welcome {
+
+}
+
+.form__submit--welcome {
+    margin-top: var(--space-16);
 }

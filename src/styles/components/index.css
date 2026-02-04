@@ -1,6 +1,7 @@
 @import "card-block/card-block.css";
+@import "form/form.css";
 @import "button/button.css";
 @import "input/input.css";
 @import "selector/selector.css";
 @import "calendar/dateSelector.css";
-@import "form/form.css";
+@import "balance/balance.css";
