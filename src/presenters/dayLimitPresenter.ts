@@ -1,4 +1,4 @@
-import { SYSTEM_EVENTS } from '../constant.ts';
+import { SYSTEM_EVENTS, SYSTEM_NAME_SPACE } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
 import { IAccountModel, IBalanceLimit } from '../models/account/IAccount.ts';
 import { IBalance } from '../models/balance/IBalance.ts';
@@ -136,10 +136,10 @@ export class DayLimitPresenter implements IDayLimitPresenter {
             }
         });
 
-        this.view!.addChild(cardBlock);
+        this.view.addChildWithKey(SYSTEM_NAME_SPACE.DAY_LIMIT_BLOCK, cardBlock);
 
         this.destroyData = () => {
-            this.view?.unmount();
+            this.view.unmount(SYSTEM_NAME_SPACE.DAY_LIMIT_BLOCK);
 
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
             balanceInput.removeEventListener('change', currencyFormatterEvent);

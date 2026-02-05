@@ -1,3 +1,4 @@
+import { SYSTEM_NAME_SPACE } from '../constant.ts';
 import {
     IBalancePresenter,
     IDayLimitPresenter,
@@ -30,10 +31,26 @@ export class MainScreen implements IScreen {
         private readonly transactionPresenter: ITransactionPresenter
     ) {}
 
-    enter(): void {
-        this.balancePresenter.init();
-        this.dayLimitPresenter.init();
-        this.transactionPresenter.init();
+    enter(page: string): void {
+        switch (page) {
+            case SYSTEM_NAME_SPACE.BALANCE_PAGE: {
+                this.dayLimitPresenter.destroy();
+                this.transactionPresenter.destroy();
+
+                break;
+            }
+            case SYSTEM_NAME_SPACE.TRANSACTION_PAGE: {
+                this.balancePresenter.destroy();
+                this.dayLimitPresenter.destroy();
+
+                break;
+            }
+            default: {
+                this.balancePresenter.init();
+                this.dayLimitPresenter.init();
+                this.transactionPresenter.init();
+            }
+        }
     }
 
     leave(): void {

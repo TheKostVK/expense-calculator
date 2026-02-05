@@ -1,41 +1,99 @@
-import { IMainView } from './types.ts';
+import { IMainView, MountKey } from './types.ts';
 
 export class MainView implements IMainView {
-    private mainNode: HTMLElement | null = document.getElementById('app');
-    private node: HTMLElement | null = null;
+    private rootNode: HTMLElement | null = document.getElementById('app');
+    private pageNode: HTMLElement;
+    private contentNode: HTMLElement;
+    private childrenByKey: Map<MountKey, HTMLElement> = new Map();
 
     constructor() {
-        if (!this.mainNode) {
+        if (!this.rootNode) {
             throw new Error('App root element #app not found');
         }
 
-        const page = document.createElement('div');
-        page.classList.add('page');
+        this.pageNode = document.createElement('div');
+        this.pageNode.classList.add('page');
 
-        const main = document.createElement('section');
-        main.classList.add('main');
+        this.contentNode = document.createElement('section');
+        this.contentNode.classList.add('main');
 
-        page.appendChild(main);
-        this.node = main;
-        this.mainNode.appendChild(page);
+        this.pageNode.appendChild(this.contentNode);
+
+        this.rootNode.appendChild(this.pageNode);
     }
 
-    mount() {
-        if (this.node) {
-            this.mainNode!.appendChild(this.node);
+    /**
+     * Монтирует элемент.
+     * - Без key: перерисовка контента
+     * - С key: монтирование/замена элемента в конкретном слоте key.
+     */
+    public mount(child: HTMLElement, key?: MountKey): void {
+        if (!key) {
+            this.contentNode.replaceChildren(child);
+            this.childrenByKey.clear();
+
+            return;
         }
+
+        const existing = this.childrenByKey.get(key);
+
+        if (existing) {
+            existing.remove();
+            this.childrenByKey.delete(key);
+        }
+
+        child.dataset.key = key;
+
+        this.childrenByKey.set(key, child);
+        this.contentNode.appendChild(child);
     }
 
-    unmount() {
-        this.node!.replaceChildren();
+    /**
+     * Размонтирует элемент
+     * - Без key: полностью очищает
+     * - С key: удаляет только связанный с key узел
+     */
+    public unmount(key?: MountKey): boolean {
+        if (!key) {
+            const hadAny = this.contentNode.childNodes.length > 0;
+
+            this.contentNode.replaceChildren();
+            this.childrenByKey.clear();
+
+            return hadAny;
+        }
+
+        const el = this.childrenByKey.get(key);
+
+        if (!el) {
+            return false;
+        }
+
+        el.remove();
+
+        this.childrenByKey.delete(key);
+
+        return true;
     }
 
-    update(children: HTMLElement) {
-        this.node!.replaceChildren();
-        this.node!.appendChild(children);
+    /**
+     * Append без ключа
+     */
+    public addChild(child: HTMLElement): void {
+        this.contentNode.appendChild(child);
     }
 
-    addChild(children: HTMLElement) {
-        this.node!.appendChild(children);
+    /**
+     * Добавляет элемент с ключом
+     * @returns функция, которая удалит этот элемент по ключу
+     */
+    public addChildWithKey(key: MountKey, child: HTMLElement): () => boolean {
+        this.mount(child, key);
+
+        return () => this.unmount(key);
+    }
+
+    public hasKey(key: MountKey): boolean {
+        return this.childrenByKey.has(key);
     }
 }

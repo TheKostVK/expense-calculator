@@ -41,10 +41,14 @@ export async function initApp(): Promise<void> {
     const dayLimitPresenter = new DayLimitPresenter(accountModel, mainView, events);
     const transactionPresenter = new TransactionPresenter(accountModel, mainView, events);
 
+    const mainScreen = new MainScreen(balancePresenter, dayLimitPresenter, transactionPresenter);
+
     // Screens
     const screens: Record<string, IScreen> = {
         [SYSTEM_NAME_SPACE.WELCOME_PAGE]: new WelcomeScreen(welcomePagePresenter),
-        [SYSTEM_NAME_SPACE.MAIN_PAGE]: new MainScreen(balancePresenter, dayLimitPresenter, transactionPresenter),
+        [SYSTEM_NAME_SPACE.MAIN_PAGE]: mainScreen,
+        [SYSTEM_NAME_SPACE.BALANCE_PAGE]: mainScreen,
+        [SYSTEM_NAME_SPACE.TRANSACTION_PAGE]: mainScreen,
     };
 
     // Router + Store + App

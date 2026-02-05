@@ -15,14 +15,12 @@ export class Router implements IRouter {
             return;
         }
 
-        if (this.current === next) {
-            return;
+        if (this.current !== next) {
+            this.current?.leave();
+            this.current = next;
         }
 
-        this.current?.leave();
-        this.current = next;
-
-        await next.enter();
+        await next.enter(name);
     }
 
     public destroy(): void {

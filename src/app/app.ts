@@ -32,12 +32,12 @@ export class App implements IApp {
             await this.router.go(SYSTEM_NAME_SPACE.MAIN_PAGE);
         });
 
-        this.events.on(SYSTEM_EVENTS.CHANGE_PAGE, async (page) => {
-            if (typeof page !== 'string') {
+        this.events.on(SYSTEM_EVENTS.CHANGE_PAGE, async (obj: { page: string }) => {
+            if (typeof obj.page !== 'string') {
                 return;
             }
 
-            await this.router.go(page);
+            await this.router.go(obj.page);
         });
     }
 }

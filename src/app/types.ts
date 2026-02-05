@@ -18,6 +18,6 @@ export interface IRouter {
  * Унифицированный контракт экрана
  */
 export interface IScreen {
-    enter(): void | Promise<void>;
+    enter(page?: string): void | Promise<void>;
     leave(): void;
 }

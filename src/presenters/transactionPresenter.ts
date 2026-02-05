@@ -1,4 +1,4 @@
-import { SYSTEM_EVENTS } from '../constant.ts';
+import { SYSTEM_EVENTS, SYSTEM_NAME_SPACE } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
 import { IAccountModel } from '../models/account/IAccount.ts';
 import { IBalance } from '../models/balance/IBalance.ts';
@@ -68,15 +68,25 @@ export class TransactionPresenter implements ITransactionPresenter {
 
         cardBlock.appendChild(cardBody);
 
-        this.view.addChild(cardBlock);
+        viewHistoryButton.addEventListener('click', this.handleViewFullHistory.bind(this));
+
+        this.view.addChildWithKey(SYSTEM_NAME_SPACE.TRANSACTION_BLOCK, cardBlock);
 
         this.destroyData = () => {
-            this.view.unmount();
+            viewHistoryButton.removeEventListener('click', this.handleViewFullHistory.bind(this));
+
+            this.view.unmount(SYSTEM_NAME_SPACE.TRANSACTION_BLOCK);
         };
     }
 
     public destroy() {
         this.destroyData();
+    }
+
+    private handleViewFullHistory(event: Event) {
+        event.preventDefault();
+
+        this.events.emit(SYSTEM_EVENTS.CHANGE_PAGE, { page: SYSTEM_NAME_SPACE.TRANSACTION_PAGE });
     }
 
     private transactionsListUpdated(transactionsListNode: HTMLElement) {

@@ -1,4 +1,4 @@
-import { SYSTEM_EVENTS } from '../constant.ts';
+import { SYSTEM_EVENTS, SYSTEM_NAME_SPACE } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
 import { IAccountModel } from '../models/account/IAccount.ts';
 import { IBalance } from '../models/balance/IBalance.ts';
@@ -76,15 +76,25 @@ export class BalancePresenter implements IBalancePresenter {
 
         cardBlock.appendChild(cardBody);
 
-        this.view!.addChild(cardBlock);
+        balanceChangeButton.addEventListener('click', this.handleChangeBalance.bind(this));
+
+        this.view.addChildWithKey(SYSTEM_NAME_SPACE.BALANCE_BLOCK, cardBlock);
 
         this.destroyData = () => {
-            this.view?.unmount();
+            balanceChangeButton.removeEventListener('click', this.handleChangeBalance.bind(this));
+
+            this.view.unmount(SYSTEM_NAME_SPACE.BALANCE_BLOCK);
         };
     }
 
     public destroy() {
         this.destroyData();
+    }
+
+    private handleChangeBalance(event: Event) {
+        event.preventDefault();
+
+        this.events.emit(SYSTEM_EVENTS.CHANGE_PAGE, { page: SYSTEM_NAME_SPACE.BALANCE_PAGE });
     }
 
     private balanceUpdate() {

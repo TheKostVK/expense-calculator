@@ -1,6 +1,6 @@
 import { Calendar } from '../components/calendar/calendar.ts';
 import { DateSelector } from '../components/calendar/dateSelector.ts';
-import { SYSTEM_EVENTS } from '../constant.ts';
+import { SYSTEM_EVENTS, SYSTEM_NAME_SPACE } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
 import { IAccountModel } from '../models/account/IAccount.ts';
 import { currencyFormatterEvent, numberFormatter, onlyNumbersFormatter } from '../utils/formatters/inputFormatter.ts';
@@ -90,7 +90,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
             }
         });
 
-        this.view.update(cardBlock);
+        this.view.addChildWithKey(SYSTEM_NAME_SPACE.WELCOME_PAGE, cardBlock);
 
         this.destroyData = () => {
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
@@ -99,7 +99,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
             dateSelector.destroy();
             calendarObj.destroy();
 
-            this.view.unmount();
+            this.view.unmount(SYSTEM_NAME_SPACE.WELCOME_PAGE);
         };
     }
 
