@@ -1,20 +1,33 @@
-import { IEvents } from '../../events/events.ts';
-
 import { ITransaction, ITransactionModel } from './ITransaction.ts';
 
 export class TransactionModel implements ITransactionModel {
-    events: IEvents | undefined = undefined;
+    private transactions: ITransaction[] = [];
 
-    constructor(events: IEvents) {
-        this.events = events;
+    public setTransactions(transactions: ITransaction[]): void {
+        this.transactions = transactions;
     }
 
-    createTransaction(transaction: ITransaction): Promise<ITransaction> {
-        return Promise.resolve(transaction);
+    public getTransactions(): ITransaction[] {
+        return this.transactions;
     }
 
-    deleteTransaction(id: string): Promise<void> {
-        console.log(id);
-        return Promise.resolve();
+    public getTransaction(id: string): ITransaction | undefined {
+        return this.transactions.find((transaction) => transaction.id === id);
+    }
+
+    public getTransactionsCount(): number {
+        return this.transactions.length;
+    }
+
+    public createTransaction(transaction: ITransaction): void {
+        this.transactions.push(transaction);
+
+        return;
+    }
+
+    public deleteTransaction(id: string): void {
+        this.transactions = this.transactions.filter((transaction) => transaction.id !== id);
+
+        return;
     }
 }

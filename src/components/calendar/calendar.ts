@@ -5,6 +5,7 @@ import {
     getNextTwoWeek,
     getNextWeek,
 } from '../../utils/date/dateUtils.ts';
+import { dateFormatter } from '../../utils/formatters/dateFormatter.ts';
 import { Selector } from '../selector/selecor.ts';
 
 import { ICalendar } from './ICalendar.ts';
@@ -21,13 +22,6 @@ export class Calendar extends Selector implements ICalendar {
         nextMonth: { value: getNextMonth(), label: 'Месяц' },
         lastDayOfMonth: { value: getLastDayOfCurrentMonth(), label: 'До конца месяца' },
     };
-    /**
-     * Стабильный formatter
-     */
-    private formatter = new Intl.DateTimeFormat('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-    });
 
     constructor(data: ICalendar, dateSelector: IDateSelector) {
         super(data);
@@ -85,13 +79,13 @@ export class Calendar extends Selector implements ICalendar {
             const { item, span1, span2 } = getMenuItem();
 
             span1.textContent = option.label;
-            span2.textContent = `до ${this.formatter.format(option.value)}`;
+            span2.textContent = `до ${dateFormatter(option.value)}`;
 
             option.value.setHours(23, 59, 59, 999);
 
             item.value = option.value.toISOString().toString();
             item.dataset.key = key;
-            item.dataset.value = `${option.label} (до ${this.formatter.format(option.value)})`;
+            item.dataset.value = `${option.label} (до ${dateFormatter(option.value)})`;
 
             item.append(span1, span2);
             dropdown.appendChild(item);

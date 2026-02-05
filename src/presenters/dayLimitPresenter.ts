@@ -1,23 +1,39 @@
+import { SYSTEM_EVENTS } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
-import { IBalance, IBalanceModel } from '../models/balance/IBalance.ts';
-import { currencyFormatter, currencyFormatterEvent, onlyNumbersFormatter } from '../utils/formatters/inputFormatter.ts';
+import { IAccountModel, IBalanceLimit } from '../models/account/IAccount.ts';
+import { IBalance } from '../models/balance/IBalance.ts';
+import { getCurrentDate } from '../utils/date/dateUtils.ts';
+import { ITransactionCreate } from '../utils/db/types.ts';
+import {
+    currencyFormatter,
+    currencyFormatterEvent,
+    numberFormatter,
+    onlyNumbersFormatter,
+} from '../utils/formatters/inputFormatter.ts';
 import { IMainView } from '../views/types.ts';
 
 import { IDayLimitPresenter } from './types.ts';
 
 export class DayLimitPresenter implements IDayLimitPresenter {
-    private events: IEvents | undefined = undefined;
-    private balanceModel: IBalanceModel | undefined = undefined;
-    private view: IMainView | undefined = undefined;
+    private readonly events: IEvents;
+    private readonly accountModel: IAccountModel;
+    private readonly view: IMainView;
+    private wastedNode: HTMLElement | undefined = undefined;
+    private commentBlock: HTMLElement | undefined = undefined;
 
-    constructor(balanceModel: IBalanceModel, view: IMainView, events: IEvents) {
-        this.balanceModel = balanceModel;
+    constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
+        this.accountModel = accountModel;
         this.view = view;
         this.events = events;
+
+        this.events.on(SYSTEM_EVENTS.BALANCE_UPDATED, () => {
+            this.balanceUpdate(this.wastedNode!);
+            this.commentUpdate(this.commentBlock!);
+        });
     }
 
     public init() {
-        const balanceModel: IBalance = this.balanceModel!.getBalanceData();
+        const balance: IBalance = this.accountModel.getBalance();
 
         const cardBlock = document.createElement('div');
         cardBlock.classList.add('card-block');
@@ -42,16 +58,15 @@ export class DayLimitPresenter implements IDayLimitPresenter {
         const balanceBlockH1 = document.createElement('h1');
         balanceBlockH1.classList.add('balance-block__balance');
 
-        const remainedBalanceDay = balanceModel.dayLimit - balanceModel.wasted;
-
         const balanceBlockSpan1 = document.createElement('span');
-        balanceBlockSpan1.classList.add('balance-block__balance--remained');
-        balanceBlockSpan1.textContent = currencyFormatter(remainedBalanceDay);
+
+        this.balanceUpdate(balanceBlockSpan1);
 
         const balanceBlockSpan2 = document.createElement('span');
         balanceBlockSpan2.classList.add('balance-block__balance--available');
-        balanceBlockSpan2.textContent = currencyFormatter(balanceModel.dayLimit);
+        balanceBlockSpan2.textContent = currencyFormatter(balance.dayLimit);
 
+        this.wastedNode = balanceBlockSpan1;
         balanceBlockH1.appendChild(balanceBlockSpan1);
         balanceBlockH1.appendChild(balanceBlockSpan2);
 
@@ -61,13 +76,15 @@ export class DayLimitPresenter implements IDayLimitPresenter {
 
         const wastedComment = document.createElement('p');
         wastedComment.classList.add('balance-block__wasted-comment');
-        wastedComment.textContent = ' 🎉 Отлично справились — сегодня вы в пределах лимита!';
+
+        this.commentBlock = wastedComment;
+        this.commentUpdate(wastedComment);
 
         cardBody.appendChild(wastedComment);
 
         const form = document.createElement('form');
         form.name = 'welcome';
-        form.classList.add('form', 'form--welcome');
+        form.classList.add('form', 'form--day-limit');
 
         /* label.input */
         const balanceLabel = document.createElement('label');
@@ -78,7 +95,7 @@ export class DayLimitPresenter implements IDayLimitPresenter {
         balanceTitle.textContent = 'Введите трату';
 
         const balanceInput = document.createElement('input');
-        balanceInput.name = 'start-balance';
+        balanceInput.name = 'wasted';
         balanceInput.classList.add('input__input');
         balanceInput.placeholder = '0 ₽';
 
@@ -97,15 +114,63 @@ export class DayLimitPresenter implements IDayLimitPresenter {
 
         cardBlock.appendChild(cardBody);
 
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const wasted: Element | RadioNodeList | null = form.elements.namedItem('wasted');
+
+            if (!wasted) {
+                return;
+            }
+
+            if ('value' in wasted) {
+                const newTransaction: ITransactionCreate = {
+                    value: numberFormatter(wasted.value),
+                    date: getCurrentDate().toISOString(),
+                };
+
+                await this.accountModel.addTransaction(newTransaction);
+
+                balanceInput.value = '';
+                balanceInput.placeholder = '0 ₽';
+            }
+        });
+
         this.view!.addChild(cardBlock);
 
         this.destroyData = () => {
             this.view?.unmount();
+
+            balanceInput.removeEventListener('input', onlyNumbersFormatter);
+            balanceInput.removeEventListener('change', currencyFormatterEvent);
         };
     }
 
     public destroy() {
         this.destroyData();
+    }
+
+    private balanceUpdate(node: HTMLElement): void {
+        const remainedBalanceDay = this.accountModel.getRemainedBalanceDay();
+
+        node.textContent = currencyFormatter(remainedBalanceDay);
+        node.classList.remove();
+
+        if (remainedBalanceDay >= 0) {
+            node.classList.add('balance-block__balance--remained--success');
+        } else {
+            node.classList.add('balance-block__balance--remained--error');
+        }
+    }
+
+    private commentUpdate(node: HTMLElement): void {
+        const balanceLimit: IBalanceLimit = this.accountModel.getBalanceLimit();
+
+        if (balanceLimit.inLimit) {
+            node.textContent = '🎉 Отлично справились — сегодня вы в пределах лимита!';
+        } else {
+            node.textContent = '❌ Вы превысили лимит на сегодня!';
+        }
     }
 
     private destroyData: () => void = () => {};

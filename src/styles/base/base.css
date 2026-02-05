@@ -109,7 +109,7 @@ fieldset {
     max-width: 1140px;
     margin: auto;
 
-    padding: var(--space-64) 0;
+    padding: var(--space-48) 0;
 
     display: grid;
     grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));

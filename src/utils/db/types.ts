@@ -2,6 +2,7 @@ import { DBSchema } from 'idb';
 
 import { balanceTableName, transactionTableName } from '../../constant.ts';
 import { BalanceId, IBalance } from '../../models/balance/IBalance.ts';
+import { ITransaction } from '../../models/transaction/ITransaction.ts';
 
 /**
  * Входные данные для создания записи баланса.
@@ -32,19 +33,9 @@ export interface BalanceDB extends DBSchema {
 export type TransactionId = string;
 
 /**
- * Модель транзакции, которая хранится в IndexedDB.
- */
-export interface Transaction {
-    id: TransactionId;
-    date: Date;
-    value: number;
-}
-
-/**
  * Входные данные для создания транзакции.
- * id можно не передавать — он будет сгенерирован.
  */
-export type TransactionCreateInput = Omit<Transaction, 'id'> & { id?: TransactionId };
+export type ITransactionCreate = Omit<ITransaction, 'id'>;
 
 /**
  * Результат сохранения/обновления.
@@ -58,6 +49,6 @@ export type SaveTransactionResult = TransactionId;
 export interface TransactionDB extends DBSchema {
     [transactionTableName]: {
         key: TransactionId;
-        value: Transaction;
+        value: ITransaction;
     };
 }

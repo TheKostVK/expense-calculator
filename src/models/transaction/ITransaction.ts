@@ -1,10 +1,16 @@
+import { TransactionId } from '../../utils/db/types.ts';
+
 export interface ITransaction {
-    id: string;
-    date: Date;
+    id: TransactionId;
+    date: string;
     value: number;
 }
 
 export interface ITransactionModel {
-    createTransaction(transaction: ITransaction): Promise<ITransaction>;
-    deleteTransaction(id: string): Promise<void>;
+    setTransactions(transactions: ITransaction[]): void;
+    getTransactions(): ITransaction[];
+    getTransaction(id: string): ITransaction | undefined;
+    getTransactionsCount(): number;
+    createTransaction(transaction: ITransaction): void;
+    deleteTransaction(id: string): void;
 }

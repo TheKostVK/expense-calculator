@@ -1,9 +1,10 @@
 import { nanoid } from 'nanoid';
 
 import { transactionDBName, transactionDBVersion, transactionTableName } from '../../constant.ts';
+import { ITransaction } from '../../models/transaction/ITransaction.ts';
 
 import { IndexedDBService } from './db.ts';
-import { SaveTransactionResult, Transaction, TransactionCreateInput, TransactionDB, TransactionId } from './types.ts';
+import { ITransactionCreate, SaveTransactionResult, TransactionDB, TransactionId } from './types.ts';
 
 /**
  * Открытие БД с типизированной схемой.
@@ -21,11 +22,11 @@ export const transactionDBPromise = IndexedDBService.open<TransactionDB>(
 /**
  * Создать или обновить транзакцию.
  */
-export async function saveTransaction(transaction: TransactionCreateInput): Promise<SaveTransactionResult> {
+export async function saveTransaction(transaction: ITransactionCreate): Promise<SaveTransactionResult> {
     const db = await transactionDBPromise;
 
-    const id = transaction.id ?? nanoid();
-    const record: Transaction = { ...transaction, id };
+    const id = nanoid();
+    const record: ITransaction = { ...transaction, id };
 
     await db.put(transactionTableName, record);
 
@@ -35,7 +36,7 @@ export async function saveTransaction(transaction: TransactionCreateInput): Prom
 /**
  * Получить транзакцию по id.
  */
-export async function getTransaction(id: TransactionId): Promise<Transaction | undefined> {
+export async function getTransaction(id: TransactionId): Promise<ITransaction | undefined> {
     const db = await transactionDBPromise;
     return db.get(transactionTableName, id);
 }
@@ -43,7 +44,7 @@ export async function getTransaction(id: TransactionId): Promise<Transaction | u
 /**
  * Получить все транзакции.
  */
-export async function getAllTransactions(): Promise<Transaction[]> {
+export async function getAllTransactions(): Promise<ITransaction[]> {
     const db = await transactionDBPromise;
     return db.getAll(transactionTableName);
 }

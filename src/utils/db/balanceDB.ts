@@ -18,7 +18,7 @@ export const balanceDBPromise = IndexedDBService.open<BalanceDB>(balanceDBName, 
 /**
  * Создать или обновить баланс.
  */
-export async function saveBalanceDB(record: BalanceCreateInput): Promise<SaveBalanceResult> {
+export async function saveBalance(record: BalanceCreateInput): Promise<SaveBalanceResult> {
     const db = await balanceDBPromise;
 
     const id = record.id ?? nanoid();
@@ -32,7 +32,7 @@ export async function saveBalanceDB(record: BalanceCreateInput): Promise<SaveBal
 /**
  * Получить баланс по id.
  */
-export async function getBalanceDB(id: BalanceId): Promise<IBalance | undefined> {
+export async function getBalance(id: BalanceId): Promise<IBalance | undefined> {
     const db = await balanceDBPromise;
     return db.get(balanceTableName, id);
 }
@@ -40,7 +40,7 @@ export async function getBalanceDB(id: BalanceId): Promise<IBalance | undefined>
 /**
  * Получить все балансы.
  */
-export async function getAllBalancesDB(): Promise<IBalance[]> {
+export async function getAllBalances(): Promise<IBalance[]> {
     const db = await balanceDBPromise;
     return db.getAll(balanceTableName);
 }

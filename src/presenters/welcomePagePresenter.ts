@@ -2,20 +2,19 @@ import { Calendar } from '../components/calendar/calendar.ts';
 import { DateSelector } from '../components/calendar/dateSelector.ts';
 import { SYSTEM_EVENTS } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
-import { IBalance, IBalanceModel } from '../models/balance/IBalance.ts';
-import { getCurrentDate } from '../utils/date/dateUtils.ts';
+import { IAccountModel } from '../models/account/IAccount.ts';
 import { currencyFormatterEvent, numberFormatter, onlyNumbersFormatter } from '../utils/formatters/inputFormatter.ts';
 import { IMainView } from '../views/types.ts';
 
 import { IWelcomePagePresenter } from './types.ts';
 
 export class WelcomePagePresenter implements IWelcomePagePresenter {
-    private events: IEvents | undefined = undefined;
-    private balanceModel: IBalanceModel | undefined = undefined;
-    private view: IMainView | undefined = undefined;
+    private readonly events: IEvents;
+    private readonly accountModel: IAccountModel;
+    private readonly view: IMainView;
 
-    constructor(balanceModel: IBalanceModel, view: IMainView, events: IEvents) {
-        this.balanceModel = balanceModel;
+    constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
+        this.accountModel = accountModel;
         this.view = view;
         this.events = events;
     }
@@ -74,7 +73,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
 
         cardBlock.append(title, body);
 
-        form.addEventListener('submit', (event) => {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const startBalance: Element | RadioNodeList | null = form.elements.namedItem('start-balance');
@@ -85,22 +84,13 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
             }
 
             if ('value' in startBalance && 'value' in term) {
-                const newBalance: IBalance = {
-                    id: getCurrentDate().toISOString(),
-                    endDate: term.value,
-                    value: numberFormatter(startBalance.value),
-                    wasted: 0,
-                    dayLimit: 0,
-                    avgDayWasted: 0,
-                };
+                await this.accountModel.initBalance(numberFormatter(startBalance.value), new Date(term.value));
 
-                this.balanceModel?.updateBalance(newBalance);
-
-                this.events?.emit(SYSTEM_EVENTS.WELCOME_COMPLETED);
+                this.events?.emit(SYSTEM_EVENTS.INIT_BALANCE);
             }
         });
 
-        this.view!.update(cardBlock);
+        this.view.update(cardBlock);
 
         this.destroyData = () => {
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
@@ -109,7 +99,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
             dateSelector.destroy();
             calendarObj.destroy();
 
-            this.view?.unmount();
+            this.view.unmount();
         };
     }
 

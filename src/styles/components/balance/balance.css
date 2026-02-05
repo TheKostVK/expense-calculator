@@ -10,8 +10,16 @@
 
 }
 
-.balance-block__balance--remained {
+.balance-block__balance--remained--success {
     color: var(--color-success);
+}
+
+.balance-block__balance--remained--zero {
+    color: var(--color-text-secondary);
+}
+
+.balance-block__balance--remained--error {
+    color: var(--color-error);
 }
 
 .balance-block__balance--available {

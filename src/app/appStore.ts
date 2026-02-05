@@ -1,29 +1,35 @@
 import { LS_NAME_SPACE, SYSTEM_EVENTS } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
 import { IBalance, IBalanceModel } from '../models/balance/IBalance.ts';
+import { ITransaction, ITransactionModel } from '../models/transaction/ITransaction.ts';
 import { getCurrentDate } from '../utils/date/dateUtils.ts';
-import { getAllBalancesDB, getBalanceDB, saveBalanceDB } from '../utils/db/balanceDB.ts';
+import { getAllBalances, getBalance, saveBalance } from '../utils/db/balanceDB.ts';
+import { getAllTransactions } from '../utils/db/transactionDB.ts';
 
 import { IAppStore } from './types.ts';
 
 export class AppStore implements IAppStore {
-    private welcomeCompleted = false;
+    private readonly events: IEvents;
+    private readonly balanceModel: IBalanceModel;
+    private readonly transactionModel: ITransactionModel;
 
-    constructor(
-        private readonly balanceModel: IBalanceModel,
-        private readonly events: IEvents
-    ) {
-        this.welcomeCompleted = localStorage.getItem(LS_NAME_SPACE.WELCOME_COMPLETED) === 'true';
+    private initBalanceCompleted = false;
 
-        if (!this.welcomeCompleted) {
-            this.events.on(SYSTEM_EVENTS.WELCOME_COMPLETED, () => {
+    constructor(events: IEvents, balanceModel: IBalanceModel, transactionModel: ITransactionModel) {
+        this.events = events;
+        this.balanceModel = balanceModel;
+        this.transactionModel = transactionModel;
+        this.initBalanceCompleted = localStorage.getItem(LS_NAME_SPACE.INIT_BALANCE) === 'true';
+
+        if (!this.initBalanceCompleted) {
+            this.events.on(SYSTEM_EVENTS.INIT_BALANCE, () => {
                 this.completeWelcome();
             });
         }
     }
 
     public isWelcomeCompleted(): boolean {
-        return this.welcomeCompleted;
+        return this.initBalanceCompleted;
     }
 
     /**
@@ -31,27 +37,38 @@ export class AppStore implements IAppStore {
      */
     public async init(): Promise<void> {
         await this.initBalance();
+        await this.initTransactions();
     }
 
     /**
      * Отмечает онбординг завершённым и уведомляет систему.
      */
     public completeWelcome(): void {
-        this.welcomeCompleted = true;
-        localStorage.setItem(LS_NAME_SPACE.WELCOME_COMPLETED, 'true');
+        this.initBalanceCompleted = true;
+        localStorage.setItem(LS_NAME_SPACE.INIT_BALANCE, 'true');
     }
 
-    private async initBalance(): Promise<IBalance> {
+    private async initTransactions(): Promise<void> {
         try {
-            const balance: IBalance | undefined = await getBalanceDB(getCurrentDate().toISOString());
+            const transactions: ITransaction[] = await getAllTransactions();
+
+            this.transactionModel.setTransactions(transactions);
+        } catch (err) {
+            console.error(err);
+        }
+
+        return;
+    }
+
+    private async initBalance(): Promise<void> {
+        try {
+            const balance: IBalance | undefined = await getBalance(getCurrentDate().toISOString());
 
             if (!balance) {
-                const balances: IBalance[] = await getAllBalancesDB();
+                const balances: IBalance[] = await getAllBalances();
 
                 if (balances.length === 0) {
-                    await saveBalanceDB(this.balanceModel.getBalanceData());
-
-                    throw new Error('Balance not found');
+                    await saveBalance(this.balanceModel.getBalanceData());
                 } else {
                     this.balanceModel.updateBalance(balances[balances.length - 1]);
                 }
@@ -59,9 +76,9 @@ export class AppStore implements IAppStore {
                 this.balanceModel.updateBalance(balance);
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
 
-        return this.balanceModel.getBalanceData();
+        return;
     }
 }

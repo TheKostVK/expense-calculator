@@ -11,13 +11,13 @@ export class DateSelector {
     currentDate: Date = getCurrentDate();
     selectedDate: Date = getCurrentDate();
     /**
-     * Стабильный formatter
+     * Стабильный dateFormatter
      */
     private formatterDay = new Intl.DateTimeFormat('ru-RU', {
         day: 'numeric',
     });
     /**
-     * Стабильный formatter
+     * Стабильный dateFormatter
      */
     private formatterMount = new Intl.DateTimeFormat('ru-RU', {
         day: 'numeric',

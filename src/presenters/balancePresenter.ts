@@ -1,5 +1,7 @@
+import { SYSTEM_EVENTS } from '../constant.ts';
 import { IEvents } from '../events/events.ts';
-import { IBalance, IBalanceModel } from '../models/balance/IBalance.ts';
+import { IAccountModel } from '../models/account/IAccount.ts';
+import { IBalance } from '../models/balance/IBalance.ts';
 import { differentDateInDay } from '../utils/date/dateUtils.ts';
 import { currencyFormatter } from '../utils/formatters/inputFormatter.ts';
 import { IMainView } from '../views/types.ts';
@@ -7,18 +9,23 @@ import { IMainView } from '../views/types.ts';
 import { IBalancePresenter } from './types.ts';
 
 export class BalancePresenter implements IBalancePresenter {
-    private events: IEvents | undefined = undefined;
-    private balanceModel: IBalanceModel | undefined = undefined;
-    private view: IMainView | undefined = undefined;
+    private readonly events: IEvents;
+    private readonly accountModel: IAccountModel;
+    private readonly view: IMainView;
+    private balanceNode: HTMLElement | undefined = undefined;
 
-    constructor(balanceModel: IBalanceModel, view: IMainView, events: IEvents) {
-        this.balanceModel = balanceModel;
+    constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
+        this.accountModel = accountModel;
         this.view = view;
         this.events = events;
+
+        this.events.on(SYSTEM_EVENTS.BALANCE_UPDATED, () => {
+            this.balanceUpdate();
+        });
     }
 
     public init() {
-        const balanceModel: IBalance = this.balanceModel!.getBalanceData();
+        const balance: IBalance = this.accountModel.getBalance();
 
         const cardBlock = document.createElement('div');
         cardBlock.classList.add('card-block');
@@ -32,7 +39,7 @@ export class BalancePresenter implements IBalancePresenter {
 
         const cardDescSpan2 = document.createElement('span');
         cardDescSpan2.classList.add('card__title-right');
-        cardDescSpan2.textContent = `${currencyFormatter(balanceModel.dayLimit)} в день`;
+        cardDescSpan2.textContent = `${currencyFormatter(balance.dayLimit)} в день`;
 
         cardDescription.appendChild(cardDescSpan1);
         cardDescription.appendChild(cardDescSpan2);
@@ -45,16 +52,17 @@ export class BalancePresenter implements IBalancePresenter {
         const balanceBlock = document.createElement('div');
         balanceBlock.classList.add('balance-block');
 
-        const differentDayToEnd = differentDateInDay(new Date(balanceModel.id), new Date(balanceModel.endDate));
+        const differentDayToEnd = differentDateInDay(new Date(balance.id), new Date(balance.endDate));
 
         const balanceBlockSpan1 = document.createElement('h1');
         balanceBlockSpan1.classList.add('balance-block__balance');
-        balanceBlockSpan1.textContent = currencyFormatter(balanceModel.value);
+        balanceBlockSpan1.textContent = currencyFormatter(balance.value);
 
         const balanceBlockSpan2 = document.createElement('span');
         balanceBlockSpan2.classList.add('balance-block__day');
         balanceBlockSpan2.textContent = `на ${differentDayToEnd} дней`;
 
+        this.balanceNode = balanceBlockSpan1;
         balanceBlock.appendChild(balanceBlockSpan1);
         balanceBlock.appendChild(balanceBlockSpan2);
 
@@ -77,6 +85,12 @@ export class BalancePresenter implements IBalancePresenter {
 
     public destroy() {
         this.destroyData();
+    }
+
+    private balanceUpdate() {
+        const balance: IBalance = this.accountModel.getBalance();
+
+        this.balanceNode!.textContent = currencyFormatter(balance.value);
     }
 
     private destroyData: () => void = () => {};

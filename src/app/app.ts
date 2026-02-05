@@ -28,7 +28,7 @@ export class App implements IApp {
     }
 
     private bindEvents(): void {
-        this.events.on(SYSTEM_EVENTS.WELCOME_COMPLETED, async () => {
+        this.events.on(SYSTEM_EVENTS.INIT_BALANCE, async () => {
             await this.router.go(SYSTEM_NAME_SPACE.MAIN_PAGE);
         });
 
