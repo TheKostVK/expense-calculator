@@ -9,6 +9,17 @@
     overflow: auto scroll;
 }
 
+.transactions-list--full {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+
+    padding: var(--space-12);
+
+    border: solid 1px var(--color-border);
+    border-radius: var(--radius-xs);
+}
+
 .transaction-card {
     position: relative;
 

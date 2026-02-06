@@ -45,12 +45,13 @@ export class MainScreen implements IScreen {
                 this.balancePresenter.destroy();
                 this.dayLimitPresenter.destroy();
 
-                this.transactionPresenter.fullScreenView(true);
+                this.transactionPresenter.initOverflow();
 
                 break;
             }
             default: {
                 this.balancePresenter.overflowDestroy();
+                this.transactionPresenter.overflowDestroy();
 
                 this.balancePresenter.init();
                 this.dayLimitPresenter.init();

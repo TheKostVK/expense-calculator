@@ -88,8 +88,6 @@ export class BalancePresenter implements IBalancePresenter {
         this.view.addChildWithKey(SYSTEM_NAME_SPACE.BALANCE_BLOCK, cardBlock);
 
         this.destroyData = () => {
-            this.cardNode?.classList.toggle('card-block--hidden');
-
             balanceChangeButton.removeEventListener('click', this.handleChangeBalance.bind(this));
 
             this.view.unmount(SYSTEM_NAME_SPACE.BALANCE_BLOCK);
@@ -101,6 +99,8 @@ export class BalancePresenter implements IBalancePresenter {
     }
 
     public initOverflow() {
+        this.view.unmount(SYSTEM_NAME_SPACE.BALANCE_BLOCK);
+
         const balance: IBalance = this.accountModel.getBalance();
 
         const cardBlock = document.createElement('div');
@@ -186,28 +186,14 @@ export class BalancePresenter implements IBalancePresenter {
 
         cardBlock.appendChild(cardBody);
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const upBalance: Element | RadioNodeList | null = form.elements.namedItem('up-balance');
-            const term: Element | RadioNodeList | null = form.elements.namedItem('term');
-
-            if (!upBalance || !term) {
-                return;
-            }
-
-            if ('value' in upBalance && 'value' in term) {
-                await this.accountModel.upBalance(numberFormatter(upBalance.value), new Date(term.value));
-            }
-
-            this.events.emit(SYSTEM_EVENTS.CHANGE_PAGE, { page: SYSTEM_NAME_SPACE.MAIN_PAGE });
-        });
+        form.addEventListener('submit', this.handleSubmitForm.bind(this));
 
         this.view.addChildWithKey(SYSTEM_NAME_SPACE.BALANCE_PAGE, cardBlock);
 
         this.overflowDestroyData = () => {
             upBalanceInput.removeEventListener('input', onlyNumbersFormatter);
             upBalanceInput.removeEventListener('change', currencyFormatterEvent);
+            form.removeEventListener('submit', this.handleSubmitForm.bind(this));
 
             this.view.unmount(SYSTEM_NAME_SPACE.BALANCE_PAGE);
         };
@@ -215,6 +201,33 @@ export class BalancePresenter implements IBalancePresenter {
 
     public overflowDestroy() {
         this.overflowDestroyData();
+    }
+
+    private async handleSubmitForm(event: Event) {
+        event.preventDefault();
+
+        if (!this.cardNode) {
+            throw new Error('Card node is not defined');
+        }
+
+        const form = this.cardNode.querySelector('form');
+
+        if (!form) {
+            throw new Error('Form is not defined');
+        }
+
+        const upBalance: Element | RadioNodeList | null = form.elements.namedItem('up-balance');
+        const term: Element | RadioNodeList | null = form.elements.namedItem('term');
+
+        if (!upBalance || !term) {
+            return;
+        }
+
+        if ('value' in upBalance && 'value' in term) {
+            await this.accountModel.upBalance(numberFormatter(upBalance.value), new Date(term.value));
+        }
+
+        this.events.emit(SYSTEM_EVENTS.CHANGE_PAGE, { page: SYSTEM_NAME_SPACE.MAIN_PAGE });
     }
 
     private handleChangeBalance(event: Event) {

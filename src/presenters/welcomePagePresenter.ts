@@ -12,6 +12,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
     private readonly events: IEvents;
     private readonly accountModel: IAccountModel;
     private readonly view: IMainView;
+    private cardNode: HTMLElement | undefined = undefined;
 
     constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
         this.accountModel = accountModel;
@@ -58,7 +59,6 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
                 name: 'term',
                 title: 'На срок',
                 placeholder: 'Выбор даты',
-                showCustomDateSelector: false,
             },
             dateSelector
         );
@@ -73,28 +73,15 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
 
         cardBlock.append(title, body);
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        form.addEventListener('submit', this.handleSubmitForm.bind(this));
 
-            const startBalance: Element | RadioNodeList | null = form.elements.namedItem('start-balance');
-            const term: Element | RadioNodeList | null = form.elements.namedItem('term');
-
-            if (!startBalance || !term) {
-                return;
-            }
-
-            if ('value' in startBalance && 'value' in term) {
-                await this.accountModel.initBalance(numberFormatter(startBalance.value), new Date(term.value));
-
-                this.events.emit(SYSTEM_EVENTS.INIT_BALANCE);
-            }
-        });
-
+        this.cardNode = cardBlock;
         this.view.addChildWithKey(SYSTEM_NAME_SPACE.WELCOME_PAGE, cardBlock);
 
         this.destroyData = () => {
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
             balanceInput.removeEventListener('change', currencyFormatterEvent);
+            form.removeEventListener('submit', this.handleSubmitForm.bind(this));
 
             dateSelector.destroy();
             calendarObj.destroy();
@@ -105,6 +92,33 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
 
     destroy() {
         this.destroyData();
+    }
+
+    private async handleSubmitForm(event: Event) {
+        event.preventDefault();
+
+        if (!this.cardNode) {
+            throw new Error('Card node is not defined');
+        }
+
+        const form = this.cardNode.querySelector('form');
+
+        if (!form) {
+            throw new Error('Form is not defined');
+        }
+
+        const startBalance: Element | RadioNodeList | null = form.elements.namedItem('start-balance');
+        const term: Element | RadioNodeList | null = form.elements.namedItem('term');
+
+        if (!startBalance || !term) {
+            return;
+        }
+
+        if ('value' in startBalance && 'value' in term) {
+            await this.accountModel.initBalance(numberFormatter(startBalance.value), new Date(term.value));
+
+            this.events.emit(SYSTEM_EVENTS.INIT_BALANCE);
+        }
     }
 
     private destroyData: () => void = () => {};
