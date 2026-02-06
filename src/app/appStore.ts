@@ -70,7 +70,16 @@ export class AppStore implements IAppStore {
                 if (balances.length === 0) {
                     await saveBalance(this.balanceModel.getBalanceData());
                 } else {
-                    this.balanceModel.updateBalance(balances[balances.length - 1]);
+                    const balance: IBalance = balances[balances.length - 1];
+                    const newBalance: IBalance = {
+                        ...balance,
+                        id: getCurrentDate().toISOString(),
+                        wasted: 0,
+                    };
+
+                    await saveBalance(newBalance);
+
+                    this.balanceModel.updateBalance(newBalance);
                 }
             } else {
                 this.balanceModel.updateBalance(balance);

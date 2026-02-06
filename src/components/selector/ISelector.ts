@@ -7,3 +7,8 @@ export interface ISelector {
         label: string;
     }[];
 }
+
+export interface ISelectorClass {
+    destroy(): void;
+    getNode(): HTMLFieldSetElement;
+}

@@ -57,6 +57,41 @@ export class DateSelector {
     }
 
     /**
+     * Задать дефолтное значение выбранной даты.
+     *
+     * - Принимает Date | ISO-строку.
+     * - Нормализует дату (конец дня), чтобы сравнения с currentDate работали стабильно.
+     * - Если дата находится в прошлом относительно currentDate — ставит currentDate.
+     * - Перерисовывает календарь.
+     *
+     * @param value Дата по умолчанию (Date или ISO string)
+     */
+    public setDefaultValue(value: Date | string): void {
+        const parsed = typeof value === 'string' ? new Date(value) : new Date(value);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return;
+        }
+
+        parsed.setHours(23, 59, 59, 999);
+
+        const nextSelected = parsed < this.currentDate ? new Date(this.currentDate) : parsed;
+
+        const year = nextSelected.getFullYear();
+        const month = nextSelected.getMonth();
+        const day = nextSelected.getDate();
+
+        const lastDayOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999).getDate();
+        const safeDay = Math.min(day, lastDayOfMonth);
+
+        this.selectedDate = new Date(year, month, safeDay, 23, 59, 59, 999);
+
+        if (this.calendarNode) {
+            this.updateDatePicker();
+        }
+    }
+
+    /**
      * Нормализует дату к первому дню месяца (00:00:00.000)
      */
     private getMonthStart(date: Date): Date {

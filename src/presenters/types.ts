@@ -6,6 +6,8 @@ export interface IWelcomePagePresenter {
 export interface IBalancePresenter {
     init(): void;
     destroy(): void;
+    initOverflow(): void;
+    overflowDestroy(): void;
 }
 
 export interface IDayLimitPresenter {
@@ -16,4 +18,6 @@ export interface IDayLimitPresenter {
 export interface ITransactionPresenter {
     init(): void;
     destroy(): void;
+    initOverflow(): void;
+    overflowDestroy(): void;
 }

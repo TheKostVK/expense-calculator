@@ -24,7 +24,7 @@
     transition: border-color ease-in-out var(--animation-normal), box-shadow ease-in-out var(--animation-fast);
 }
 
-.input__input:hover {
+.input__input:not(:disabled):hover {
     border: 1px solid var(--color-primary);
 }
 
@@ -32,4 +32,9 @@
     outline: none;
     border: 1px solid var(--color-primary);
     box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.input__input:disabled {
+    background-color: var(--color-bg);
+    cursor: not-allowed;
 }

@@ -1,5 +1,7 @@
-import { ISelector } from '../selector/ISelector.ts';
+import { ISelector, ISelectorClass } from '../selector/ISelector.ts';
 
-export interface ICalendar extends Omit<ISelector, 'options'> {
-    showCustomDateSelector: boolean;
+export interface ICalendarClass extends ISelectorClass {
+    setValue(value: Date | string, label?: string): void;
 }
+
+export type ICalendar = Omit<ISelector, 'options'>;

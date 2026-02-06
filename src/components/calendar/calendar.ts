@@ -8,14 +8,13 @@ import {
 import { dateFormatter } from '../../utils/formatters/dateFormatter.ts';
 import { Selector } from '../selector/selecor.ts';
 
-import { ICalendar } from './ICalendar.ts';
+import { ICalendar, ICalendarClass } from './ICalendar.ts';
 import { IDateSelector } from './IDateSelector.ts';
 
-export class Calendar extends Selector implements ICalendar {
-    showCustomDateSelector = false;
-    dateSelector: IDateSelector | null = null;
+export class Calendar extends Selector implements ICalendarClass {
+    private readonly dateSelector: IDateSelector | null = null;
 
-    baseOptions = {
+    private baseOptions = {
         nextDay: { value: getNextDay(), label: 'День' },
         nextWeek: { value: getNextWeek(), label: 'Неделя' },
         nextTwoWeek: { value: getNextTwoWeek(), label: 'Две недели' },
@@ -25,8 +24,36 @@ export class Calendar extends Selector implements ICalendar {
 
     constructor(data: ICalendar, dateSelector: IDateSelector) {
         super(data);
-        this.showCustomDateSelector = data.showCustomDateSelector;
         this.dateSelector = dateSelector;
+    }
+
+    /**
+     * Установить значение календаря извне.
+     *
+     * - Принимает Date или ISO-строку.
+     * - Обновляет значение инпута селектора (отображаемое значение).
+     * - Прокидывает дату в DateSelector через setDefaultValue(),
+     *   чтобы кастомный календарь показывал корректный месяц/день.
+     *
+     * @param value Дата (Date | ISO string)
+     * @param label Необязательный текст для инпута. Если не передан — будет "до {date}"
+     */
+    public setValue(value: Date | string, label?: string): void {
+        const parsed = typeof value === 'string' ? new Date(value) : new Date(value);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return;
+        }
+
+        parsed.setHours(23, 59, 59, 999);
+
+        this.dateSelector?.setDefaultValue(parsed);
+
+        if (this.input && this.hiddenInput) {
+            this.input.value = label ?? `до ${dateFormatter(parsed)}`;
+
+            this.hiddenInput.value = parsed.toISOString() ?? '';
+        }
     }
 
     override openDropdown() {

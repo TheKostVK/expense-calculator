@@ -18,8 +18,7 @@ export class DayLimitPresenter implements IDayLimitPresenter {
     private readonly events: IEvents;
     private readonly accountModel: IAccountModel;
     private readonly view: IMainView;
-    private wastedNode: HTMLElement | undefined = undefined;
-    private commentBlock: HTMLElement | undefined = undefined;
+    private cardNode: HTMLElement | undefined = undefined;
 
     constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
         this.accountModel = accountModel;
@@ -27,8 +26,8 @@ export class DayLimitPresenter implements IDayLimitPresenter {
         this.events = events;
 
         this.events.on(SYSTEM_EVENTS.BALANCE_UPDATED, () => {
-            this.balanceUpdate(this.wastedNode!);
-            this.commentUpdate(this.commentBlock!);
+            this.balanceUpdate();
+            this.commentUpdate();
         });
     }
 
@@ -59,14 +58,13 @@ export class DayLimitPresenter implements IDayLimitPresenter {
         balanceBlockH1.classList.add('balance-block__balance');
 
         const balanceBlockSpan1 = document.createElement('span');
-
-        this.balanceUpdate(balanceBlockSpan1);
+        balanceBlockSpan1.classList.add('balance-block__balance--wasted');
+        balanceBlockSpan1.textContent = currencyFormatter(balance.wasted);
 
         const balanceBlockSpan2 = document.createElement('span');
         balanceBlockSpan2.classList.add('balance-block__balance--available');
         balanceBlockSpan2.textContent = currencyFormatter(balance.dayLimit);
 
-        this.wastedNode = balanceBlockSpan1;
         balanceBlockH1.appendChild(balanceBlockSpan1);
         balanceBlockH1.appendChild(balanceBlockSpan2);
 
@@ -76,9 +74,6 @@ export class DayLimitPresenter implements IDayLimitPresenter {
 
         const wastedComment = document.createElement('p');
         wastedComment.classList.add('balance-block__wasted-comment');
-
-        this.commentBlock = wastedComment;
-        this.commentUpdate(wastedComment);
 
         cardBody.appendChild(wastedComment);
 
@@ -136,9 +131,16 @@ export class DayLimitPresenter implements IDayLimitPresenter {
             }
         });
 
+        this.cardNode = cardBlock;
+
+        this.balanceUpdate();
+        this.commentUpdate();
+
         this.view.addChildWithKey(SYSTEM_NAME_SPACE.DAY_LIMIT_BLOCK, cardBlock);
 
         this.destroyData = () => {
+            this.cardNode?.classList.toggle('card-block--hidden');
+
             this.view.unmount(SYSTEM_NAME_SPACE.DAY_LIMIT_BLOCK);
 
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
@@ -150,26 +152,48 @@ export class DayLimitPresenter implements IDayLimitPresenter {
         this.destroyData();
     }
 
-    private balanceUpdate(node: HTMLElement): void {
-        const remainedBalanceDay = this.accountModel.getRemainedBalanceDay();
+    private balanceUpdate(): void {
+        if (!this.cardNode) {
+            throw new Error('Card node is not defined');
+        }
 
-        node.textContent = currencyFormatter(remainedBalanceDay);
-        node.classList.remove();
+        const balanceBlockWaste = this.cardNode.querySelector('.balance-block__balance--wasted');
+        const balanceBlockAviable = this.cardNode.querySelector('.balance-block__balance--available');
 
-        if (remainedBalanceDay >= 0) {
-            node.classList.add('balance-block__balance--remained--success');
+        if (!balanceBlockWaste || !balanceBlockAviable) {
+            throw new Error('Balance block is not defined');
+        }
+
+        const remainedBalanceDay = this.accountModel.getBalanceLimit();
+
+        balanceBlockAviable.textContent = currencyFormatter(remainedBalanceDay.limit);
+        balanceBlockWaste.textContent = currencyFormatter(remainedBalanceDay.remained);
+        balanceBlockWaste.classList.remove();
+
+        if (remainedBalanceDay.remained >= 0) {
+            balanceBlockWaste.classList.add('balance-block__balance--remained--success');
         } else {
-            node.classList.add('balance-block__balance--remained--error');
+            balanceBlockWaste.classList.add('balance-block__balance--remained--error');
         }
     }
 
-    private commentUpdate(node: HTMLElement): void {
+    private commentUpdate(): void {
+        if (!this.cardNode) {
+            throw new Error('Card node is not defined');
+        }
+
+        const commentBlock = this.cardNode.querySelector('.balance-block__wasted-comment');
+
+        if (!commentBlock) {
+            throw new Error('Comment block is not defined');
+        }
+
         const balanceLimit: IBalanceLimit = this.accountModel.getBalanceLimit();
 
         if (balanceLimit.inLimit) {
-            node.textContent = '🎉 Отлично справились — сегодня вы в пределах лимита!';
+            commentBlock.textContent = '🎉 Отлично справились — сегодня вы в пределах лимита!';
         } else {
-            node.textContent = '❌ Вы превысили лимит на сегодня!';
+            commentBlock.textContent = '❌ Вы превысили лимит на сегодня!';
         }
     }
 

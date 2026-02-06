@@ -1,21 +1,30 @@
 .card-block {
     width: 100%;
-
     padding: var(--space-24);
-
     border-radius: var(--radius-lg);
     box-sizing: border-box;
-
     box-shadow: var(--shadow-e1);
-
     background: var(--color-surface);
 
     display: flex;
     flex-direction: column;
+
+    transition: opacity var(--animation-fast);
 }
 
 .card-block--welcome {
     margin: auto;
+    gap: var(--space-16);
+}
+
+.card-block--hidden {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.card-block--overflow {
+    position: absolute;
+    
     gap: var(--space-16);
 }
 

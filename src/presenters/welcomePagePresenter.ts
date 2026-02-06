@@ -86,7 +86,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
             if ('value' in startBalance && 'value' in term) {
                 await this.accountModel.initBalance(numberFormatter(startBalance.value), new Date(term.value));
 
-                this.events?.emit(SYSTEM_EVENTS.INIT_BALANCE);
+                this.events.emit(SYSTEM_EVENTS.INIT_BALANCE);
             }
         });
 

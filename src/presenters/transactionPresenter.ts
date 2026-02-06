@@ -13,6 +13,7 @@ export class TransactionPresenter implements ITransactionPresenter {
     private readonly events: IEvents;
     private readonly accountModel: IAccountModel;
     private readonly view: IMainView;
+    private cardNode: HTMLElement | undefined = undefined;
     private transactionsListNode: HTMLElement | undefined = undefined;
 
     constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
@@ -70,9 +71,12 @@ export class TransactionPresenter implements ITransactionPresenter {
 
         viewHistoryButton.addEventListener('click', this.handleViewFullHistory.bind(this));
 
+        this.cardNode = cardBlock;
         this.view.addChildWithKey(SYSTEM_NAME_SPACE.TRANSACTION_BLOCK, cardBlock);
 
         this.destroyData = () => {
+            this.cardNode?.classList.toggle('card-block--hidden');
+
             viewHistoryButton.removeEventListener('click', this.handleViewFullHistory.bind(this));
 
             this.view.unmount(SYSTEM_NAME_SPACE.TRANSACTION_BLOCK);
@@ -81,6 +85,12 @@ export class TransactionPresenter implements ITransactionPresenter {
 
     public destroy() {
         this.destroyData();
+    }
+
+    public initOverflow(): void {}
+
+    public overflowDestroy() {
+        this.overflowDestroyData();
     }
 
     private handleViewFullHistory(event: Event) {
@@ -114,4 +124,5 @@ export class TransactionPresenter implements ITransactionPresenter {
     }
 
     private destroyData: () => void = () => {};
+    private overflowDestroyData: () => void = () => {};
 }

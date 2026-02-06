@@ -1,15 +1,15 @@
-import { ISelector } from './ISelector.ts';
+import { ISelector, ISelectorClass } from './ISelector.ts';
 
-export class Selector implements ISelector {
-    hiddenInput: HTMLInputElement | undefined = undefined;
-    selector: HTMLFieldSetElement | undefined = undefined;
-    dropdown: HTMLDivElement | undefined = undefined;
-    input: HTMLInputElement | undefined = undefined;
-    button: HTMLButtonElement | undefined = undefined;
-    name: string = '';
-    title: string = '';
-    placeholder: string = '';
-    options: { value: string; label: string }[] = [];
+export class Selector implements ISelectorClass {
+    protected hiddenInput: HTMLInputElement | undefined = undefined;
+    protected selector: HTMLFieldSetElement | undefined = undefined;
+    protected dropdown: HTMLDivElement | undefined = undefined;
+    protected input: HTMLInputElement | undefined = undefined;
+    protected button: HTMLButtonElement | undefined = undefined;
+    protected name: string = '';
+    protected title: string = '';
+    protected placeholder: string = '';
+    protected options: { value: string; label: string }[] = [];
 
     constructor(data: ISelector) {
         this.name = data.name;
@@ -80,17 +80,58 @@ export class Selector implements ISelector {
         document.addEventListener('click', this.onDocumentClick.bind(this));
     }
 
-    public destroy() {
+    public destroy(): void {
         this.selector?.removeEventListener('click', this.onButtonClick.bind(this));
         this.dropdown?.removeEventListener('click', this.onDropdownItemClick.bind(this));
+
         document.removeEventListener('click', this.onDocumentClick.bind(this));
     }
 
     /**
      * Получить DOM-узел селектора
      */
-    public getNode() {
+    public getNode(): HTMLFieldSetElement {
         return this.selector || document.createElement('fieldset');
+    }
+
+    /**
+     * Открыть выпадающее меню
+     */
+    protected openDropdown() {
+        if (!this.dropdown) {
+            return;
+        }
+
+        this.dropdown.replaceChildren();
+        this.renderOptions(this.dropdown);
+        this.dropdown.classList.add('dropdown_menu-visible');
+    }
+
+    /**
+     * Закрыть выпадающее меню
+     */
+    protected closeDropdown() {
+        if (!this.dropdown) {
+            return;
+        }
+
+        this.dropdown.classList.remove('dropdown_menu-visible');
+    }
+
+    /**
+     * Рендер стандартных опций
+     */
+    protected renderOptions(dropdown: HTMLDivElement) {
+        this.options.forEach((opt) => {
+            const item = document.createElement('button');
+
+            item.type = 'button';
+            item.classList.add('dropdown_menu--item');
+            item.dataset.value = opt.value;
+            item.textContent = opt.label;
+
+            dropdown.appendChild(item);
+        });
     }
 
     /**
@@ -149,45 +190,5 @@ export class Selector implements ISelector {
         if (!this.selector || !this.selector.contains(target)) {
             this.dropdown?.classList.remove('dropdown_menu-visible');
         }
-    }
-
-    /**
-     * Открыть выпадающее меню
-     */
-    protected openDropdown() {
-        if (!this.dropdown) {
-            return;
-        }
-
-        this.dropdown.replaceChildren();
-        this.renderOptions(this.dropdown);
-        this.dropdown.classList.add('dropdown_menu-visible');
-    }
-
-    /**
-     * Закрыть выпадающее меню
-     */
-    protected closeDropdown() {
-        if (!this.dropdown) {
-            return;
-        }
-
-        this.dropdown.classList.remove('dropdown_menu-visible');
-    }
-
-    /**
-     * Рендер стандартных опций
-     */
-    protected renderOptions(dropdown: HTMLDivElement) {
-        this.options.forEach((opt) => {
-            const item = document.createElement('button');
-
-            item.type = 'button';
-            item.classList.add('dropdown_menu--item');
-            item.dataset.value = opt.value;
-            item.textContent = opt.label;
-
-            dropdown.appendChild(item);
-        });
     }
 }

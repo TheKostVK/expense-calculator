@@ -32,6 +32,11 @@
     background-color: transparent;
 }
 
+.selector__input:disabled {
+    background-color: var(--color-bg);
+    cursor: not-allowed;
+}
+
 .selector__drop_button {
     position: absolute;
 
