@@ -206,11 +206,7 @@ export class BalancePresenter implements IBalancePresenter {
     private async handleSubmitForm(event: Event) {
         event.preventDefault();
 
-        if (!this.cardNode) {
-            throw new Error('Card node is not defined');
-        }
-
-        const form = this.cardNode.querySelector('form');
+        const form: HTMLFormElement | null = document.forms.namedItem('change-balance');
 
         if (!form) {
             throw new Error('Form is not defined');
@@ -243,7 +239,7 @@ export class BalancePresenter implements IBalancePresenter {
 
         const balance: IBalance = this.accountModel.getBalance();
 
-        const balanceNode = this.cardNode.querySelector('.card__title-left');
+        const balanceNode = this.cardNode.querySelector('.balance-block__balance');
         const dayLimitNode = this.cardNode.querySelector('.card__title-right');
 
         if (!balanceNode || !dayLimitNode) {

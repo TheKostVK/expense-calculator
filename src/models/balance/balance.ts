@@ -1,4 +1,4 @@
-import { differentDateInDay, getCurrentDate } from '../../utils/date/dateUtils.ts';
+import { getCurrentDate } from '../../utils/date/dateUtils.ts';
 
 import { IBalance, IBalanceModel } from './IBalance.ts';
 
@@ -22,13 +22,10 @@ export class BalanceModel implements IBalanceModel {
     }
 
     public updateBalance(balance: IBalance) {
-        const endDate: Date = new Date(balance.endDate);
-        const diffDays: number = differentDateInDay(this.date, endDate);
-
-        this.endDate = endDate;
+        this.endDate = new Date(balance.endDate);
         this.value = balance.value;
         this.wasted = balance.wasted;
-        this.dayLimit = balance.value / diffDays;
+        this.dayLimit = balance.dayLimit;
         this.avgDayWasted = balance.avgDayWasted;
     }
 }

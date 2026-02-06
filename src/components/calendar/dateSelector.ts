@@ -1,6 +1,7 @@
-import nextSvg from '../../assets/next.svg';
-import prevDisabledSvg from '../../assets/prev-disabled.svg';
-import prevSvg from '../../assets/prev.svg';
+import nextSvg from '@/assets/next.svg';
+import prevDisabledSvg from '@/assets/prev-disabled.svg';
+import prevSvg from '@/assets/prev.svg';
+
 import { getCurrentDate } from '../../utils/date/dateUtils.ts';
 
 export class DateSelector {

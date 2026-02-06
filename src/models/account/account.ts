@@ -110,7 +110,7 @@ export class AccountModel implements IAccountModel {
             avgDayWasted: balance.wasted / transactionsCount,
         };
 
-        if (wasted > balance.dayLimit - balance.wasted) {
+        if (balance.dayLimit - balance.wasted <= 0) {
             const diffDays: number = differentDateInDay(getCurrentDate(), new Date(newBalance.endDate));
 
             newBalance = {

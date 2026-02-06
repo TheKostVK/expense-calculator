@@ -1,3 +1,5 @@
+import downSvg from '@/assets/down.svg';
+
 import { ISelector, ISelectorClass } from './ISelector.ts';
 
 export class Selector implements ISelectorClass {
@@ -57,7 +59,7 @@ export class Selector implements ISelectorClass {
 
         const img = document.createElement('img');
         img.classList.add('selector__drop_button-img');
-        img.src = 'src/assets/down.svg';
+        img.src = downSvg;
         img.alt = 'dropdown button';
 
         button.appendChild(img);

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import * as path from 'node:path';
 
 export default defineConfig({
     base: '/expense-calculator/',
@@ -13,6 +14,12 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         sourcemap: true,
+    },
+
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+        },
     },
 
     optimizeDeps: {

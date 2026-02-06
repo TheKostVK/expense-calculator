@@ -12,7 +12,6 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
     private readonly events: IEvents;
     private readonly accountModel: IAccountModel;
     private readonly view: IMainView;
-    private cardNode: HTMLElement | undefined = undefined;
 
     constructor(accountModel: IAccountModel, view: IMainView, events: IEvents) {
         this.accountModel = accountModel;
@@ -75,7 +74,6 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
 
         form.addEventListener('submit', this.handleSubmitForm.bind(this));
 
-        this.cardNode = cardBlock;
         this.view.addChildWithKey(SYSTEM_NAME_SPACE.WELCOME_PAGE, cardBlock);
 
         this.destroyData = () => {
@@ -97,11 +95,7 @@ export class WelcomePagePresenter implements IWelcomePagePresenter {
     private async handleSubmitForm(event: Event) {
         event.preventDefault();
 
-        if (!this.cardNode) {
-            throw new Error('Card node is not defined');
-        }
-
-        const form = this.cardNode.querySelector('form');
+        const form: HTMLFormElement | null = document.forms.namedItem('welcome');
 
         if (!form) {
             throw new Error('Form is not defined');

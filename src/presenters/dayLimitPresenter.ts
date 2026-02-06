@@ -78,7 +78,7 @@ export class DayLimitPresenter implements IDayLimitPresenter {
         cardBody.appendChild(wastedComment);
 
         const form = document.createElement('form');
-        form.name = 'welcome';
+        form.name = 'form-wasted';
         form.classList.add('form', 'form--day-limit');
 
         /* label.input */
@@ -109,27 +109,7 @@ export class DayLimitPresenter implements IDayLimitPresenter {
 
         cardBlock.appendChild(cardBody);
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const wasted: Element | RadioNodeList | null = form.elements.namedItem('wasted');
-
-            if (!wasted) {
-                return;
-            }
-
-            if ('value' in wasted) {
-                const newTransaction: ITransactionCreate = {
-                    value: numberFormatter(wasted.value),
-                    date: getCurrentDate().toISOString(),
-                };
-
-                await this.accountModel.addTransaction(newTransaction);
-
-                balanceInput.value = '';
-                balanceInput.placeholder = '0 ₽';
-            }
-        });
+        form.addEventListener('submit', this.handleSubmitForm.bind(this));
 
         this.cardNode = cardBlock;
 
@@ -145,11 +125,40 @@ export class DayLimitPresenter implements IDayLimitPresenter {
 
             balanceInput.removeEventListener('input', onlyNumbersFormatter);
             balanceInput.removeEventListener('change', currencyFormatterEvent);
+            form.removeEventListener('submit', this.handleSubmitForm.bind(this));
         };
     }
 
     public destroy() {
         this.destroyData();
+    }
+
+    private async handleSubmitForm(event: Event) {
+        event.preventDefault();
+
+        const form: HTMLFormElement | null = document.forms.namedItem('form-wasted');
+
+        if (!form) {
+            throw new Error('Form is not defined');
+        }
+
+        const balanceInput: Element | RadioNodeList | null = form.elements.namedItem('wasted');
+
+        if (!balanceInput || !(balanceInput instanceof HTMLInputElement)) {
+            throw new Error('Wasted is not defined');
+        }
+
+        if ('value' in balanceInput) {
+            const newTransaction: ITransactionCreate = {
+                value: numberFormatter(balanceInput.value),
+                date: getCurrentDate().toISOString(),
+            };
+
+            await this.accountModel.addTransaction(newTransaction);
+
+            balanceInput.value = '';
+            balanceInput.placeholder = '0 ₽';
+        }
     }
 
     private balanceUpdate(): void {
