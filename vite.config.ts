@@ -23,6 +23,6 @@ export default defineConfig({
     },
 
     optimizeDeps: {
-        include: ['idb', 'date-fns', 'zod', 'nanoid'],
+        include: ['idb', 'date-fns', 'nanoid'],
     },
 });
